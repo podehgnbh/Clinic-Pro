@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Pro | لوحة التحكم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { background: #f0f2f5; font-family: sans-serif; }
+        .sidebar { background: #064e3b; color: white; }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen">
+
+    <div class="sidebar w-full md:w-64 p-6 space-y-8">
+        <h2 class="text-2xl font-bold border-b border-white/20 pb-4">CLINIC <span class="text-yellow-500">PRO</span></h2>
+        <nav class="space-y-4">
+            <a href="#" class="block p-3 bg-white/10 rounded-xl"><i class="fas fa-home ml-2"></i> الرئيسة</a>
+            <a href="#" onclick="showSection('addPatient')" class="block p-3 hover:bg-white/5 rounded-xl"><i class="fas fa-user-plus ml-2"></i> إضافة مريض</a>
+            <a href="#" onclick="showSection('labRequest')" class="block p-3 hover:bg-white/5 rounded-xl"><i class="fas fa-microscope ml-2"></i> طلب تحاليل</a>
+            <a href="index.html" class="block p-3 text-red-300 mt-10"><i class="fas fa-sign-out-alt ml-2"></i> خروج</a>
+        </nav>
+    </div>
+
+    <div class="flex-1 p-6 md:p-10">
+        <header class="flex justify-between items-center mb-10">
+            <h1 id="pageTitle" class="text-2xl font-bold text-emerald-900">مرحباً دكتور، أهلاً بك</h1>
+            <div class="bg-white px-4 py-2 rounded-full shadow-sm">
+                <span class="text-emerald-800 font-bold" id="doctorNameDisplay">جاري التحميل...</span>
+            </div>
+        </header>
+
+        <section id="addPatientSection" class="card max-w-2xl mx-auto">
+            <h3 class="text-xl font-bold mb-6 text-emerald-800"><i class="fas fa-user-plus ml-2"></i> سجل مريض جديد</h3>
+            <form id="patientForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="pName" placeholder="اسم المريض" class="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-600" required>
+                <input type="number" id="pAge" placeholder="العمر" class="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-600" required>
+                <input type="text" id="pChronic" placeholder="الأمراض المزمنة" class="p-3 border rounded-xl md:col-span-2 outline-none focus:ring-2 focus:ring-emerald-600">
+                <textarea id="pDiagnosis" placeholder="التشخيص الحالي" class="p-3 border rounded-xl md:col-span-2 h-32 outline-none focus:ring-2 focus:ring-emerald-600"></textarea>
+                <button type="submit" class="md:col-span-2 bg-emerald-800 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-emerald-900 transition-all">حفظ البيانات</button>
+            </form>
+        </section>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_iBzd7DrziKl_wiKv8d0IBgjUClmAkSs",
+            authDomain: "clinic-pro-7c0f1.firebaseapp.com",
+            projectId: "clinic-pro-7c0f1",
+            storageBucket: "clinic-pro-7c0f1.firebasestorage.app",
+            messagingSenderId: "335745269905",
+            appId: "1:335745269905:web:8130549571da883fc2bf30"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // حفظ بيانات المريض
+        document.getElementById('patientForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await addDoc(collection(db, "patients"), {
+                    name: document.getElementById('pName').value,
+                    age: document.getElementById('pAge').value,
+                    chronic: document.getElementById('pChronic').value,
+                    diagnosis: document.getElementById('pDiagnosis').value,
+                    date: new Date().toLocaleDateString()
+                });
+                Swal.fire('تم الحفظ', 'تمت إضافة بيانات المريض بنجاح', 'success');
+                e.target.reset();
+            } catch (err) {
+                Swal.fire('خطأ', 'فشل في الحفظ: ' + err.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>
