@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinic Pro - دخول الطبيب</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green-deep:#0d4a2a;--green-mid:#1a6b3c;--green-light:#3a9e65;
+    --green-pale:#edf7f2;--green-soft:#d4eddf;
+    --gold:#c9a84c;--gold-light:#e8cc7a;--gold-dim:#9a7830;
+    --white:#ffffff;--text-dark:#0d3320;--text-mid:#2e6647;--text-muted:#7aaa8e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Tajawal',sans-serif;min-height:100vh;display:flex;background:#fff;overflow:hidden;position:relative;}
+
+  .bg-layer{position:fixed;inset:0;z-index:0;background:#fff;}
+  .bg-layer::before{
+    content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 65% 55% at -5% -5%, rgba(58,158,101,0.13) 0%,transparent 65%),
+      radial-gradient(ellipse 55% 50% at 105% 105%,rgba(201,168,76,0.10) 0%,transparent 60%);
+  }
+  .bg-layer::after{
+    content:'';position:absolute;inset:0;
+    background-image:radial-gradient(circle,rgba(26,107,60,0.06) 1px,transparent 1px);
+    background-size:32px 32px;
+    mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);
+  }
+
+  .page-wrapper{position:relative;z-index:10;width:100%;display:flex;align-items:center;justify-content:center;padding:24px;min-height:100vh;}
+
+  .login-card{
+    width:100%;max-width:420px;
+    background:rgba(255,255,255,0.90);backdrop-filter:blur(18px);
+    border:1px solid rgba(26,107,60,0.10);border-radius:28px;padding:44px 38px;
+    box-shadow:0 24px 64px rgba(26,107,60,0.10),0 8px 24px rgba(201,168,76,0.07);
+    animation:cardReveal 0.75s cubic-bezier(0.16,1,0.3,1) forwards;
+    opacity:0;transform:translateY(28px);position:relative;overflow:hidden;
+  }
+  .login-card::before{
+    content:'';position:absolute;top:0;left:10%;right:10%;height:3px;
+    background:linear-gradient(90deg,transparent,var(--gold-light),var(--gold),var(--gold-light),transparent);
+  }
+  @keyframes cardReveal{to{opacity:1;transform:translateY(0);}}
+
+  .logo-section{text-align:center;margin-bottom:28px;}
+  .logo-img-wrap{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:80px;height:80px;
+    background:linear-gradient(145deg,#fff,var(--green-pale));
+    border:1.5px solid rgba(201,168,76,0.25);border-radius:22px;margin-bottom:14px;
+    box-shadow:0 8px 28px rgba(26,107,60,0.10);
+  }
+  .logo-img{width:60px;height:60px;object-fit:contain;}
+  .brand-name{
+    font-family:'Playfair Display',serif;font-size:24px;letter-spacing:3px;
+    background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-light),var(--gold-dim));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    display:block;margin-bottom:6px;
+  }
+  .brand-tagline{font-size:11px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;}
+
+  .doctor-badge{
+    background:linear-gradient(135deg,var(--green-pale),var(--green-soft));
+    border:1px solid rgba(26,107,60,0.15);border-radius:12px;
+    padding:12px 16px;margin-bottom:24px;text-align:center;
+    font-size:13px;color:var(--text-mid);font-weight:600;
+  }
+
+  .gold-divider{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+  .gold-divider::before,.gold-divider::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,0.35),transparent);}
+  .gold-divider span{font-size:12px;color:var(--text-mid);letter-spacing:2px;font-weight:700;white-space:nowrap;}
+
+  .form-group{margin-bottom:16px;}
+  .form-label{display:block;font-size:12px;font-weight:700;color:var(--text-mid);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+  .input-wrap{position:relative;}
+  .input-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:16px;opacity:0.45;pointer-events:none;}
+  .form-input{
+    width:100%;background:var(--green-pale);border:1.5px solid rgba(26,107,60,0.12);
+    border-radius:13px;padding:13px 44px 13px 44px;
+    color:var(--text-dark);font-family:'Tajawal',sans-serif;font-size:15px;outline:none;transition:all 0.3s;
+  }
+  .form-input:focus{border-color:var(--green-light);background:#fff;box-shadow:0 0 0 4px rgba(58,158,101,0.10);}
+  .form-input::placeholder{color:var(--text-muted);font-size:14px;}
+
+  .pass-toggle{position:absolute;left:13px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:15px;padding:4px;transition:color 0.3s;}
+  .pass-toggle:hover{color:var(--green-mid);}
+
+  .error-msg{background:#fff5f5;border:1.5px solid rgba(220,50,50,0.20);border-radius:12px;padding:11px 15px;color:#c0392b;font-size:13px;margin-bottom:14px;display:none;animation:shake 0.4s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .error-msg.show{display:block;}
+
+  .submit-btn{
+    width:100%;padding:15px;border:none;border-radius:13px;
+    background:linear-gradient(135deg,var(--green-light),var(--green-mid),var(--green-deep));
+    color:#fff;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;
+    cursor:pointer;transition:all 0.35s;position:relative;overflow:hidden;
+    letter-spacing:1px;box-shadow:0 8px 28px rgba(26,107,60,0.28);margin-bottom:0;
+  }
+  .submit-btn:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(26,107,60,0.32);}
+  .submit-btn.loading{pointer-events:none;opacity:0.8;}
+  .submit-btn .btn-text{display:inline-block;}
+  .submit-btn .btn-loader{display:none;}
+  .submit-btn.loading .btn-text{display:none;}
+  .submit-btn.loading .btn-loader{display:inline-block;width:20px;height:20px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.75s linear infinite;vertical-align:middle;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .inactive-msg{
+    text-align:center;padding:20px;background:var(--red-pale,#fff0f0);
+    border:1px solid rgba(229,57,53,0.2);border-radius:14px;color:#c0392b;
+    font-size:14px;display:none;
+  }
+  .inactive-msg.show{display:block;}
+
+  @media(max-width:480px){.login-card{padding:32px 20px;}}
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<div class="page-wrapper">
+  <div class="login-card">
+
+    <div class="logo-section">
+      <div class="logo-img-wrap">
+        <img src="1000068207.png" alt="Clinic Pro" class="logo-img" onerror="this.parentElement.innerHTML='<span style=\'font-size:36px\'>🏥</span>'">
+      </div>
+      <span class="brand-name">CLINIC PRO</span>
+      <span class="brand-tagline">بوابة الطبيب</span>
+    </div>
+
+    <div class="doctor-badge" id="doctor-badge">
+      ⏳ جاري تحميل بيانات الطبيب...
+    </div>
+
+    <div class="inactive-msg" id="inactive-msg">
+      🔴 حسابك موقف حالياً<br>
+      <small style="opacity:0.7;margin-top:4px;display:block;">تواصل مع الإدارة لتجديد الاشتراك</small>
+    </div>
+
+    <div id="login-form">
+      <div class="gold-divider">
+        <span>تسجيل الدخول</span>
+      </div>
+
+      <div class="error-msg" id="error-msg">⚠️ <span id="error-text">اسم المستخدم أو كلمة المرور غير صحيحة</span></div>
+
+      <div class="form-group">
+        <label class="form-label">اسم المستخدم</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" class="form-input" id="username" placeholder="أدخل اسم المستخدم">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">كلمة المرور</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔑</span>
+          <input type="password" class="form-input" id="password" placeholder="أدخل كلمة المرور">
+          <button class="pass-toggle" onclick="togglePass()" id="pass-toggle">👁</button>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="handleLogin()" id="submit-btn">
+        <span class="btn-text">دخول</span>
+        <span class="btn-loader"></span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://fxpiflttulvrthvdbyj.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4cGlmbHR0dWx2cnRoaHZkYnlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MzUyMDcsImV4cCI6MjA5MTExMTIwN30.LA1TbRcx7N90QOX4-zFkEDN-LyObtW2604tdREWu3m0';
+  const headers = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
+
+  // Read slug from URL
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
+  let doctorData = null;
+
+  async function loadDoctor() {
+    if (!slug) {
+      document.getElementById('doctor-badge').textContent = '❌ رابط غير صحيح';
+      document.getElementById('login-form').style.display = 'none';
+      return;
+    }
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/doctors?slug=eq.${slug}&select=*`, { headers });
+    const data = await res.json();
+    if (!data.length) {
+      document.getElementById('doctor-badge').textContent = '❌ الطبيب غير موجود';
+      document.getElementById('login-form').style.display = 'none';
+      return;
+    }
+    doctorData = data[0];
+    document.getElementById('doctor-badge').innerHTML = `👨‍⚕️ <strong>${doctorData.name}</strong> — ${doctorData.specialty}`;
+    if (!doctorData.active) {
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('inactive-msg').classList.add('show');
+    }
+  }
+
+  loadDoctor();
+
+  let passVisible = false;
+  function togglePass() {
+    passVisible = !passVisible;
+    document.getElementById('password').type = passVisible ? 'text' : 'password';
+    document.getElementById('pass-toggle').textContent = passVisible ? '🙈' : '👁';
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-msg');
+    document.getElementById('error-text').textContent = msg;
+    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  }
+
+  async function handleLogin() {
+    if (!doctorData) return;
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    if (!u||!p) { showError('يرجى ملء جميع الحقول'); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.classList.add('loading');
+
+    setTimeout(() => {
+      if (u === doctorData.username && p === doctorData.password) {
+        // Save to sessionStorage and redirect
+        sessionStorage.setItem('doctor', JSON.stringify(doctorData));
+        window.location.href = `doctor.html`;
+      } else {
+        btn.classList.remove('loading');
+        showError('اسم المستخدم أو كلمة المرور غير صحيحة');
+      }
+    }, 1000);
+  }
+
+  document.addEventListener('keydown', e => { if(e.key==='Enter') handleLogin(); });
+</script>
+</body>
+</html>

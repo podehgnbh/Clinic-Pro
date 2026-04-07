@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinic Pro - لوحة الطبيب</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green-deep:#0d4a2a;--green-mid:#1a6b3c;--green-light:#3a9e65;
+    --green-pale:#edf7f2;--green-soft:#d4eddf;
+    --gold:#c9a84c;--gold-light:#e8cc7a;--gold-dim:#9a7830;
+    --white:#ffffff;--text-dark:#0d3320;--text-mid:#2e6647;--text-muted:#7aaa8e;
+    --border:rgba(26,107,60,0.10);--shadow:rgba(26,107,60,0.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Tajawal',sans-serif;background:#f5faf7;color:var(--text-dark);min-height:100vh;}
+
+  /* TOP BAR */
+  .topbar{
+    background:var(--white);border-bottom:1px solid var(--border);
+    padding:0 28px;height:70px;display:flex;align-items:center;
+    justify-content:space-between;position:sticky;top:0;z-index:50;
+    box-shadow:0 2px 12px var(--shadow);
+  }
+  .topbar-right{display:flex;align-items:center;gap:16px;}
+  .logo-wrap{display:flex;align-items:center;gap:10px;}
+  .logo-wrap img{width:36px;height:36px;object-fit:contain;}
+  .logo-wrap span{font-size:16px;font-weight:700;color:var(--green-deep);}
+
+  /* DOCTOR CARD IN TOPBAR */
+  .doctor-info{
+    display:flex;align-items:center;gap:12px;
+    background:linear-gradient(135deg,var(--green-pale),var(--green-soft));
+    border:1px solid rgba(26,107,60,0.15);border-radius:16px;
+    padding:10px 18px;
+  }
+  .doctor-avatar{
+    width:44px;height:44px;border-radius:50%;
+    background:linear-gradient(135deg,var(--green-light),var(--green-mid));
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;color:#fff;font-weight:700;flex-shrink:0;
+    box-shadow:0 4px 12px rgba(26,107,60,0.25);
+  }
+  .doctor-name{font-size:15px;font-weight:700;color:var(--text-dark);}
+  .doctor-spec{font-size:12px;color:var(--text-muted);margin-top:2px;}
+
+  .topbar-left{display:flex;align-items:center;gap:12px;}
+  .btn-logout{
+    padding:8px 16px;border:1px solid rgba(229,57,53,0.25);
+    background:#fff0f0;color:#e53935;border-radius:10px;
+    font-family:'Tajawal',sans-serif;font-size:13px;font-weight:600;
+    cursor:pointer;transition:all 0.3s;
+  }
+  .btn-logout:hover{background:#e53935;color:#fff;}
+
+  /* MAIN */
+  .main{padding:28px;max-width:1100px;margin:0 auto;}
+
+  .welcome-banner{
+    background:linear-gradient(135deg,var(--green-mid),var(--green-deep));
+    border-radius:20px;padding:28px 32px;margin-bottom:28px;color:#fff;
+    position:relative;overflow:hidden;
+    box-shadow:0 8px 32px rgba(26,107,60,0.25);
+  }
+  .welcome-banner::before{
+    content:'🏥';position:absolute;left:24px;top:50%;transform:translateY(-50%);
+    font-size:72px;opacity:0.10;
+  }
+  .welcome-title{font-size:22px;font-weight:700;margin-bottom:6px;}
+  .welcome-sub{font-size:14px;opacity:0.75;}
+  .gold-pill{
+    display:inline-block;background:rgba(201,168,76,0.25);
+    border:1px solid rgba(201,168,76,0.4);border-radius:20px;
+    padding:4px 14px;font-size:12px;color:var(--gold-light);
+    margin-top:10px;letter-spacing:1px;
+  }
+
+  /* STATS */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .stat-card{
+    background:var(--white);border:1px solid var(--border);
+    border-radius:16px;padding:20px;
+    box-shadow:0 2px 12px var(--shadow);text-align:center;
+  }
+  .stat-icon{font-size:28px;margin-bottom:8px;}
+  .stat-num{font-size:28px;font-weight:700;color:var(--green-mid);}
+  .stat-label{font-size:12px;color:var(--text-muted);margin-top:4px;}
+
+  /* QUICK ACTIONS */
+  .section-title{font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
+  .action-card{
+    background:var(--white);border:1px solid var(--border);
+    border-radius:16px;padding:22px 18px;text-align:center;
+    cursor:pointer;transition:all 0.28s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow:0 2px 12px var(--shadow);
+  }
+  .action-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 12px 28px rgba(26,107,60,0.15);
+    border-color:var(--green-soft);
+  }
+  .action-icon{font-size:36px;margin-bottom:10px;}
+  .action-label{font-size:14px;font-weight:700;color:var(--text-dark);}
+  .action-sub{font-size:11px;color:var(--text-muted);margin-top:4px;}
+
+  /* COMING SOON badge */
+  .coming{
+    display:inline-block;background:var(--gold-pale,#fdf6e3);
+    color:var(--gold-dim);border:1px solid rgba(201,168,76,0.25);
+    border-radius:10px;padding:2px 8px;font-size:10px;margin-top:6px;
+  }
+
+  @media(max-width:768px){
+    .stats-row{grid-template-columns:1fr 1fr;}
+    .actions-grid{grid-template-columns:1fr 1fr;}
+    .topbar{padding:0 16px;}
+    .main{padding:16px;}
+    .doctor-info{padding:8px 12px;}
+    .doctor-name{font-size:13px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-right">
+    <div class="logo-wrap">
+      <img src="1000068207.png" onerror="this.style.display='none'" alt="">
+      <span>CLINIC <span style="color:var(--gold)">PRO</span></span>
+    </div>
+  </div>
+
+  <div class="doctor-info">
+    <div class="doctor-avatar" id="dr-avatar">د</div>
+    <div>
+      <div class="doctor-name" id="dr-name">...</div>
+      <div class="doctor-spec" id="dr-spec">...</div>
+    </div>
+  </div>
+
+  <div class="topbar-left">
+    <button class="btn-logout" onclick="logout()">🚪 خروج</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- Welcome -->
+  <div class="welcome-banner">
+    <div class="welcome-title" id="welcome-title">أهلاً وسهلاً 👋</div>
+    <div class="welcome-sub">نظام إدارة العيادة المتكامل — Clinic Pro</div>
+    <div class="gold-pill">✨ الإصدار 1.0</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">🧑‍🤝‍🧑</div>
+      <div class="stat-num">0</div>
+      <div class="stat-label">إجمالي المرضى</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-num">0</div>
+      <div class="stat-label">مواعيد اليوم</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔬</div>
+      <div class="stat-num">0</div>
+      <div class="stat-label">تحاليل بانتظار</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🩻</div>
+      <div class="stat-num">0</div>
+      <div class="stat-label">أشعة بانتظار</div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="section-title">⚡ الوصول السريع</div>
+  <div class="actions-grid">
+    <div class="action-card">
+      <div class="action-icon">➕</div>
+      <div class="action-label">إضافة مريض</div>
+      <div class="action-sub">تسجيل مريض جديد</div>
+    </div>
+    <div class="action-card">
+      <div class="action-icon">🔬</div>
+      <div class="action-label">طلب تحليل</div>
+      <div class="action-sub">إرسال طلب للمختبر</div>
+    </div>
+    <div class="action-card">
+      <div class="action-icon">🩻</div>
+      <div class="action-label">طلب أشعة</div>
+      <div class="action-sub">إرسال طلب للأشعة</div>
+    </div>
+    <div class="action-card">
+      <div class="action-icon">🤖</div>
+      <div class="action-label">بحث ذكي</div>
+      <div class="action-sub">بحث المرضى بالمرض</div>
+      <div class="coming">قريباً</div>
+    </div>
+    <div class="action-card">
+      <div class="action-icon">📊</div>
+      <div class="action-label">التقارير الشهرية</div>
+      <div class="action-sub">إحصائيات وتحليلات</div>
+      <div class="coming">قريباً</div>
+    </div>
+    <div class="action-card">
+      <div class="action-icon">🗂️</div>
+      <div class="action-label">ملفات التشخيص</div>
+      <div class="action-sub">كل التشخيصات مرتبة</div>
+      <div class="coming">قريباً</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Load doctor from session
+  const stored = sessionStorage.getItem('doctor');
+  if (!stored) {
+    window.location.href = 'dr-login.html';
+  } else {
+    const dr = JSON.parse(stored);
+    document.title = `Clinic Pro - د. ${dr.name}`;
+    document.getElementById('dr-name').textContent = dr.name;
+    document.getElementById('dr-spec').textContent = dr.specialty;
+    document.getElementById('welcome-title').textContent = `أهلاً، ${dr.name} 👋`;
+    // Avatar initial
+    const initial = dr.name.replace('د.','').trim()[0] || 'د';
+    document.getElementById('dr-avatar').textContent = initial;
+  }
+
+  function logout() {
+    sessionStorage.removeItem('doctor');
+    window.history.back();
+  }
+</script>
+</body>
+</html>
