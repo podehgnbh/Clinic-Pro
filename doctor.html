@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinic Pro - النظام الرئيسي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green-deep:#0d4a2a;--green-mid:#1a6b3c;--green-light:#3a9e65;
+  --green-pale:#edf7f2;--green-soft:#d4eddf;--green-xsoft:#f0faf4;
+  --gold:#c9a84c;--gold-light:#e8cc7a;--gold-dim:#9a7830;--gold-pale:#fdf8ee;
+  --red:#e53935;--red-pale:#fff0f0;
+  --blue:#1976d2;--blue-pale:#e3f0ff;
+  --orange:#f57c00;--orange-pale:#fff3e0;
+  --white:#ffffff;--bg:#f4f9f6;
+  --text-dark:#0d3320;--text-mid:#2e6647;--text-muted:#7aaa8e;--text-light:#b0ccba;
+  --border:rgba(26,107,60,0.10);--shadow:rgba(26,107,60,0.08);
+  --sidebar-w:230px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark);min-height:100vh;overflow-x:hidden;}
+
+.sidebar{position:fixed;top:0;right:0;width:var(--sidebar-w);height:100vh;background:var(--white);border-left:1px solid var(--border);box-shadow:-2px 0 20px var(--shadow);display:flex;flex-direction:column;z-index:200;transition:transform .3s ease;}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sidebar-logo img{width:34px;height:34px;object-fit:contain;}
+.logo-text{font-size:15px;font-weight:900;color:var(--green-deep);}
+.logo-pro{color:var(--gold);font-size:11px;display:block;letter-spacing:2px;font-weight:700;}
+
+.doctor-card-sidebar{margin:12px;background:linear-gradient(135deg,var(--green-mid),var(--green-deep));border-radius:14px;padding:14px;color:#fff;}
+.dr-avatar-sm{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:8px;}
+.dr-name-sm{font-size:13px;font-weight:700;}
+.dr-spec-sm{font-size:11px;opacity:.7;margin-top:2px;}
+
+.nav-section{padding:10px 0;}
+.nav-label{font-size:10px;color:var(--text-light);letter-spacing:2px;text-transform:uppercase;padding:8px 18px 4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 18px;color:var(--text-muted);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .2s;border-right:3px solid transparent;text-decoration:none;}
+.nav-item:hover{background:var(--green-pale);color:var(--green-mid);}
+.nav-item.active{background:var(--green-pale);color:var(--green-mid);border-right-color:var(--green-mid);font-weight:700;}
+.nav-icon{font-size:17px;width:22px;text-align:center;}
+
+.sidebar-footer{margin-top:auto;padding:14px 18px;border-top:1px solid var(--border);}
+.btn-logout{width:100%;padding:9px;border:1px solid rgba(229,57,53,.2);background:var(--red-pale);color:var(--red);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .3s;}
+.btn-logout:hover{background:var(--red);color:#fff;}
+
+.topbar{position:fixed;top:0;right:var(--sidebar-w);left:0;height:62px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100;box-shadow:0 2px 10px var(--shadow);}
+.topbar-title{font-size:17px;font-weight:700;color:var(--text-dark);}
+
+.btn{padding:9px 18px;border:none;border-radius:11px;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,var(--green-light),var(--green-mid));color:#fff;box-shadow:0 4px 14px rgba(26,107,60,.22);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(26,107,60,.30);}
+.btn-ghost{background:var(--green-pale);color:var(--green-mid);border:1px solid var(--green-soft);}
+.btn-ghost:hover{background:var(--green-soft);}
+.btn-danger{background:var(--red-pale);color:var(--red);border:1px solid rgba(229,57,53,.15);}
+.btn-danger:hover{background:var(--red);color:#fff;}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+
+.main{margin-right:var(--sidebar-w);margin-top:62px;padding:24px;min-height:calc(100vh - 62px);}
+.page{display:none;}
+.page.active{display:block;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 2px 10px var(--shadow);display:flex;align-items:center;gap:14px;}
+.stat-icon-wrap{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.stat-icon-wrap.green{background:var(--green-pale);}
+.stat-icon-wrap.gold{background:var(--gold-pale);}
+.stat-icon-wrap.blue{background:var(--blue-pale);}
+.stat-icon-wrap.orange{background:var(--orange-pale);}
+.stat-num{font-size:26px;font-weight:900;color:var(--text-dark);line-height:1;}
+.stat-label{font-size:11.5px;color:var(--text-muted);margin-top:3px;}
+
+.search-bar{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px var(--shadow);}
+.search-input{flex:1;border:none;outline:none;font-family:'Tajawal',sans-serif;font-size:14px;color:var(--text-dark);background:transparent;}
+.search-input::placeholder{color:var(--text-muted);}
+
+.patients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.patient-card{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 2px 10px var(--shadow);cursor:pointer;transition:all .28s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;}
+.patient-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green-light),var(--green-mid));}
+.patient-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(26,107,60,.14);border-color:var(--green-soft);}
+.patient-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.patient-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--green-light),var(--green-mid));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:700;flex-shrink:0;}
+.patient-name{font-size:15px;font-weight:700;color:var(--text-dark);}
+.patient-age{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.patient-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.tag-disease{background:var(--orange-pale);color:var(--orange);}
+.tag-diagnosis{background:var(--blue-pale);color:var(--blue);}
+.patient-dates{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);}
+.date-item{flex:1;text-align:center;}
+.date-label{font-size:10px;color:var(--text-muted);display:block;margin-bottom:3px;}
+.date-val{font-size:12px;font-weight:700;color:var(--text-dark);}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
+.empty-icon{font-size:56px;margin-bottom:14px;}
+.empty-title{font-size:18px;font-weight:700;color:var(--text-dark);margin-bottom:6px;}
+.empty-sub{font-size:13px;margin-bottom:20px;}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--white);border-radius:24px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.2);transform:scale(.95) translateY(20px);transition:all .3s cubic-bezier(.34,1.56,.64,1);position:relative;}
+.modal-overlay.show .modal{transform:scale(1) translateY(0);}
+.modal-header{padding:24px 28px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1;border-bottom:1px solid var(--border);}
+.modal-title{font-size:18px;font-weight:700;color:var(--text-dark);}
+.modal-close{width:34px;height:34px;border-radius:50%;border:none;background:var(--green-pale);color:var(--green-mid);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.modal-close:hover{background:var(--red-pale);color:var(--red);}
+.modal-body{padding:24px 28px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group.full{grid-column:1/-1;}
+.form-label{font-size:11.5px;font-weight:700;color:var(--text-mid);letter-spacing:1px;text-transform:uppercase;}
+.form-input,.form-textarea{background:var(--green-pale);border:1.5px solid rgba(26,107,60,.12);border-radius:11px;padding:11px 14px;color:var(--text-dark);font-family:'Tajawal',sans-serif;font-size:14px;outline:none;transition:all .3s;width:100%;}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-input:focus,.form-textarea:focus{border-color:var(--green-light);background:#fff;box-shadow:0 0 0 3px rgba(58,158,101,.10);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text-muted);}
+.modal-footer{padding:16px 28px 24px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);}
+
+.detail-section{margin-bottom:20px;}
+.detail-section-title{font-size:12px;font-weight:700;color:var(--text-mid);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.detail-row{display:flex;gap:8px;margin-bottom:8px;}
+.detail-key{font-size:13px;color:var(--text-muted);min-width:120px;flex-shrink:0;}
+.detail-val{font-size:13px;font-weight:600;color:var(--text-dark);}
+
+.request-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px var(--shadow);}
+.request-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.request-title{font-size:14px;font-weight:700;color:var(--text-dark);}
+.status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.status-pending{background:var(--orange-pale);color:var(--orange);}
+.status-done{background:var(--green-soft);color:var(--green-mid);}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green-mid);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(26,107,60,.3);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+.menu-toggle{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--green-mid);}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-right:0;}
+  .topbar{right:0;}
+  .menu-toggle{display:block;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .patients-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="1000068207.png" onerror="this.style.display='none'">
+    <div><span class="logo-text">CLINIC <span style="color:var(--gold)">PRO</span></span><span class="logo-pro">SYSTEM</span></div>
+  </div>
+  <div class="doctor-card-sidebar">
+    <div class="dr-avatar-sm" id="sidebar-avatar">د</div>
+    <div class="dr-name-sm" id="sidebar-name">...</div>
+    <div class="dr-spec-sm" id="sidebar-spec">...</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">القائمة الرئيسية</div>
+    <a class="nav-item active" onclick="showPage('patients',this)"><span class="nav-icon">👥</span> ملفات المرضى</a>
+    <a class="nav-item" onclick="showPage('labs',this)"><span class="nav-icon">🔬</span> التحاليل</a>
+    <a class="nav-item" onclick="showPage('radiology',this)"><span class="nav-icon">🩻</span> الأشعة</a>
+    <a class="nav-item" onclick="showPage('reports',this)"><span class="nav-icon">📊</span> التقارير</a>
+  </div>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="logout()">🚪 تسجيل الخروج</button>
+  </div>
+</div>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+    <span class="topbar-title" id="topbar-title">ملفات المرضى</span>
+  </div>
+  <div>
+    <button class="btn btn-primary" id="topbar-btn" onclick="openAddPatient()">➕ إضافة مريض</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- PATIENTS -->
+  <div class="page active" id="page-patients">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon-wrap green">👥</div><div><div class="stat-num" id="stat-total">0</div><div class="stat-label">إجمالي المرضى</div></div></div>
+      <div class="stat-card"><div class="stat-icon-wrap gold">📅</div><div><div class="stat-num" id="stat-today">0</div><div class="stat-label">مواعيد اليوم</div></div></div>
+      <div class="stat-card"><div class="stat-icon-wrap blue">🔬</div><div><div class="stat-num" id="stat-labs">0</div><div class="stat-label">تحاليل معلقة</div></div></div>
+      <div class="stat-card"><div class="stat-icon-wrap orange">🩻</div><div><div class="stat-num" id="stat-rad">0</div><div class="stat-label">أشعة معلقة</div></div></div>
+    </div>
+    <div class="search-bar">
+      <span style="font-size:18px;opacity:.5;">🔍</span>
+      <input class="search-input" id="search-input" placeholder="ابحث باسم المريض أو المرض أو التشخيص..." oninput="filterPatients()">
+    </div>
+    <div class="patients-grid" id="patients-grid"></div>
+  </div>
+
+  <!-- LABS -->
+  <div class="page" id="page-labs">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div><div style="font-size:18px;font-weight:700;">🔬 طلبات التحاليل</div></div>
+      <button class="btn btn-primary" onclick="openModal('modal-add-lab')">➕ طلب تحليل</button>
+    </div>
+    <div id="labs-list"></div>
+  </div>
+
+  <!-- RADIOLOGY -->
+  <div class="page" id="page-radiology">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div><div style="font-size:18px;font-weight:700;">🩻 طلبات الأشعة</div></div>
+      <button class="btn btn-primary" onclick="openModal('modal-add-radiology')">➕ طلب أشعة</button>
+    </div>
+    <div id="radiology-list"></div>
+  </div>
+
+  <!-- REPORTS -->
+  <div class="page" id="page-reports">
+    <div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">التقارير قريباً</div></div>
+  </div>
+
+</div>
+
+<!-- ADD PATIENT MODAL -->
+<div class="modal-overlay" id="modal-add-patient">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">➕ إضافة مريض جديد</div><button class="modal-close" onclick="closeModal('modal-add-patient')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">اسم المريض</label><input class="form-input" id="p-name" placeholder="الاسم الكامل"></div>
+        <div class="form-group"><label class="form-label">العمر</label><input class="form-input" id="p-age" type="number" placeholder="بالسنوات"></div>
+        <div class="form-group full"><label class="form-label">الأمراض المزمنة</label><input class="form-input" id="p-chronic" placeholder="سكري، ضغط، ربو..."></div>
+        <div class="form-group full"><label class="form-label">التشخيص</label><textarea class="form-textarea" id="p-diagnosis" placeholder="التشخيص الحالي..."></textarea></div>
+        <div class="form-group"><label class="form-label">آخر مراجعة</label><input class="form-input" id="p-last-visit" type="date"></div>
+        <div class="form-group"><label class="form-label">الموعد القادم</label><input class="form-input" id="p-next-visit" type="date"></div>
+        <div class="form-group full"><label class="form-label">ملاحظات</label><textarea class="form-textarea" id="p-notes" placeholder="ملاحظات إضافية..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-patient')">إلغاء</button>
+      <button class="btn btn-primary" onclick="savePatient()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW PATIENT MODAL -->
+<div class="modal-overlay" id="modal-view-patient">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="view-title">ملف المريض</div><button class="modal-close" onclick="closeModal('modal-view-patient')">✕</button></div>
+    <div class="modal-body" id="view-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="btn-delete">🗑 حذف</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-view-patient')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LAB MODAL -->
+<div class="modal-overlay" id="modal-add-lab">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🔬 طلب تحليل</div><button class="modal-close" onclick="closeModal('modal-add-lab')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">اسم المريض</label><input class="form-input" id="l-patient" placeholder="اسم المريض"></div>
+        <div class="form-group"><label class="form-label">العمر</label><input class="form-input" id="l-age" type="number" placeholder="العمر"></div>
+        <div class="form-group full"><label class="form-label">نوع التحليل</label><input class="form-input" id="l-test" placeholder="CBC, HbA1c, LFT..."></div>
+        <div class="form-group full"><label class="form-label">اسم المختبر</label><input class="form-input" id="l-lab" placeholder="اسم المختبر"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-lab')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveLab()">📤 إرسال</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD RADIOLOGY MODAL -->
+<div class="modal-overlay" id="modal-add-radiology">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🩻 طلب أشعة</div><button class="modal-close" onclick="closeModal('modal-add-radiology')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">اسم المريض</label><input class="form-input" id="r-patient" placeholder="اسم المريض"></div>
+        <div class="form-group"><label class="form-label">العمر</label><input class="form-input" id="r-age" type="number" placeholder="العمر"></div>
+        <div class="form-group full"><label class="form-label">نوع الأشعة</label><input class="form-input" id="r-scan" placeholder="X-Ray, CT, MRI, Echo..."></div>
+        <div class="form-group full"><label class="form-label">مركز الأشعة</label><input class="form-input" id="r-center" placeholder="اسم المركز"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-radiology')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveRadiology()">📤 إرسال</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SURL='https://fxpiflttulvrthvdbyj.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4cGlmbHR0dWx2cnRoaHZkYnlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MzUyMDcsImV4cCI6MjA5MTExMTIwN30.LA1TbRcx7N90QOX4-zFkEDN-LyObtW2604tdREWu3m0';
+const H={'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY};
+
+const stored=sessionStorage.getItem('doctor');
+if(!stored){window.location.href='dr-login.html';}
+const DR=JSON.parse(stored||'{}');
+document.getElementById('sidebar-name').textContent=DR.name||'';
+document.getElementById('sidebar-spec').textContent=DR.specialty||'';
+document.getElementById('sidebar-avatar').textContent=(DR.name||'د').replace('د.','').trim()[0]||'د';
+
+function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'var(--green-mid)':'#e53935';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function openAddPatient(){openModal('modal-add-patient');}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
+
+function showPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el)el.classList.add('active');
+  const titles={patients:'ملفات المرضى',labs:'التحاليل',radiology:'الأشعة',reports:'التقارير'};
+  document.getElementById('topbar-title').textContent=titles[name];
+  const btn=document.getElementById('topbar-btn');
+  btn.style.display=name==='patients'?'':'none';
+  if(name==='labs')loadLabs();
+  if(name==='radiology')loadRadiology();
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+let allPatients=[];
+async function loadPatients(){
+  const res=await fetch(`${SURL}/rest/v1/patients?doctor_id=eq.${DR.id}&order=created_at.desc`,{headers:H});
+  const data=await res.json();
+  if(!Array.isArray(data))return;
+  allPatients=data;
+  renderPatients(data);
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('stat-total').textContent=data.length;
+  document.getElementById('stat-today').textContent=data.filter(p=>p.next_visit===today).length;
+}
+
+function renderPatients(list){
+  const grid=document.getElementById('patients-grid');
+  if(!list.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👥</div><div class="empty-title">لا يوجد مرضى بعد</div><div class="empty-sub">اضغط إضافة مريض لتسجيل أول مريض</div></div>`;return;}
+  grid.innerHTML=list.map(p=>`
+    <div class="patient-card" onclick="viewPatient('${p.id}')">
+      <div class="patient-header">
+        <div class="patient-avatar">${(p.name||'م')[0]}</div>
+        <div><div class="patient-name">${p.name}</div><div class="patient-age">العمر: ${p.age} سنة</div></div>
+      </div>
+      <div class="patient-tags">
+        ${p.chronic_diseases?`<span class="tag tag-disease">🫀 ${p.chronic_diseases}</span>`:''}
+        ${p.diagnosis?`<span class="tag tag-diagnosis">📋 ${p.diagnosis.substring(0,25)}${p.diagnosis.length>25?'...':''}</span>`:''}
+      </div>
+      <div class="patient-dates">
+        <div class="date-item"><span class="date-label">آخر مراجعة</span><span class="date-val">${p.last_visit||'—'}</span></div>
+        <div class="date-item"><span class="date-label">الموعد القادم</span><span class="date-val" style="color:${p.next_visit?'var(--green-mid)':'inherit'}">${p.next_visit||'—'}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function filterPatients(){
+  const q=document.getElementById('search-input').value.toLowerCase();
+  if(!q){renderPatients(allPatients);return;}
+  renderPatients(allPatients.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.chronic_diseases||'').toLowerCase().includes(q)||(p.diagnosis||'').toLowerCase().includes(q)));
+}
+
+async function savePatient(){
+  const name=document.getElementById('p-name').value.trim();
+  const age=document.getElementById('p-age').value;
+  if(!name||!age){toast('⚠️ الاسم والعمر مطلوبان',false);return;}
+  const body={doctor_id:DR.id,name,age:parseInt(age),chronic_diseases:document.getElementById('p-chronic').value.trim(),diagnosis:document.getElementById('p-diagnosis').value.trim(),last_visit:document.getElementById('p-last-visit').value||null,next_visit:document.getElementById('p-next-visit').value||null,notes:document.getElementById('p-notes').value.trim()};
+  const res=await fetch(`${SURL}/rest/v1/patients`,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(body)});
+  if(res.ok){toast('✅ تم حفظ ملف المريض!');closeModal('modal-add-patient');['p-name','p-age','p-chronic','p-diagnosis','p-last-visit','p-next-visit','p-notes'].forEach(id=>document.getElementById(id).value='');loadPatients();}
+  else{const e=await res.json();toast('❌ '+(e.message||'خطأ'),false);}
+}
+
+function viewPatient(id){
+  const p=allPatients.find(x=>x.id===id);if(!p)return;
+  document.getElementById('view-title').textContent='📋 '+p.name;
+  document.getElementById('view-body').innerHTML=`
+    <div class="detail-section"><div class="detail-section-title">👤 المعلومات الأساسية</div>
+      <div class="detail-row"><span class="detail-key">الاسم</span><span class="detail-val">${p.name}</span></div>
+      <div class="detail-row"><span class="detail-key">العمر</span><span class="detail-val">${p.age} سنة</span></div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">🫀 الأمراض المزمنة</div>
+      <div style="background:var(--orange-pale);border-radius:10px;padding:12px;font-size:13px;color:var(--orange);">${p.chronic_diseases||'لا يوجد'}</div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">📋 التشخيص</div>
+      <div style="background:var(--blue-pale);border-radius:10px;padding:12px;font-size:13px;color:var(--blue);">${p.diagnosis||'لا يوجد'}</div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">📅 المواعيد</div>
+      <div class="detail-row"><span class="detail-key">آخر مراجعة</span><span class="detail-val">${p.last_visit||'—'}</span></div>
+      <div class="detail-row"><span class="detail-key">الموعد القادم</span><span class="detail-val" style="color:var(--green-mid)">${p.next_visit||'—'}</span></div>
+    </div>
+    ${p.notes?`<div class="detail-section"><div class="detail-section-title">📝 ملاحظات</div><div style="background:var(--green-pale);border-radius:10px;padding:12px;font-size:13px;">${p.notes}</div></div>`:''}
+  `;
+  document.getElementById('btn-delete').onclick=()=>deletePatient(id);
+  openModal('modal-view-patient');
+}
+
+async function deletePatient(id){
+  if(!confirm('هل تريد حذف هذا المريض؟'))return;
+  await fetch(`${SURL}/rest/v1/patients?id=eq.${id}`,{method:'DELETE',headers:H});
+  toast('🗑 تم الحذف');closeModal('modal-view-patient');loadPatients();
+}
+
+async function loadLabs(){
+  const res=await fetch(`${SURL}/rest/v1/lab_requests?doctor_id=eq.${DR.id}&order=created_at.desc`,{headers:H});
+  const data=await res.json();
+  const el=document.getElementById('labs-list');
+  if(!Array.isArray(data)||!data.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">🔬</div><div class="empty-title">لا توجد طلبات تحاليل</div></div>`;document.getElementById('stat-labs').textContent=0;return;}
+  document.getElementById('stat-labs').textContent=data.filter(d=>d.status==='pending').length;
+  el.innerHTML=data.map(r=>`<div class="request-card"><div class="request-header"><div class="request-title">🔬 ${r.test_type}</div><span class="status-badge ${r.status==='done'?'status-done':'status-pending'}">${r.status==='done'?'✅ مكتمل':'⏳ بانتظار'}</span></div><div style="font-size:13px;color:var(--text-muted);">👤 ${r.patient_name} — العمر: ${r.patient_age}</div><div style="font-size:13px;color:var(--text-muted);margin-top:4px;">🏥 ${r.lab_name}</div></div>`).join('');
+}
+
+async function saveLab(){
+  const patient_name=document.getElementById('l-patient').value.trim();
+  const test_type=document.getElementById('l-test').value.trim();
+  if(!patient_name||!test_type){toast('⚠️ الاسم ونوع التحليل مطلوبان',false);return;}
+  const res=await fetch(`${SURL}/rest/v1/lab_requests`,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify({doctor_id:DR.id,patient_name,patient_age:parseInt(document.getElementById('l-age').value)||0,test_type,lab_name:document.getElementById('l-lab').value.trim(),status:'pending'})});
+  if(res.ok){toast('✅ تم إرسال طلب التحليل!');closeModal('modal-add-lab');['l-patient','l-age','l-test','l-lab'].forEach(id=>document.getElementById(id).value='');loadLabs();}
+  else toast('❌ خطأ في الإرسال',false);
+}
+
+async function loadRadiology(){
+  const res=await fetch(`${SURL}/rest/v1/radiology_requests?doctor_id=eq.${DR.id}&order=created_at.desc`,{headers:H});
+  const data=await res.json();
+  const el=document.getElementById('radiology-list');
+  if(!Array.isArray(data)||!data.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">🩻</div><div class="empty-title">لا توجد طلبات أشعة</div></div>`;document.getElementById('stat-rad').textContent=0;return;}
+  document.getElementById('stat-rad').textContent=data.filter(d=>d.status==='pending').length;
+  el.innerHTML=data.map(r=>`<div class="request-card"><div class="request-header"><div class="request-title">🩻 ${r.scan_type}</div><span class="status-badge ${r.status==='done'?'status-done':'status-pending'}">${r.status==='done'?'✅ مكتمل':'⏳ بانتظار'}</span></div><div style="font-size:13px;color:var(--text-muted);">👤 ${r.patient_name} — العمر: ${r.patient_age}</div><div style="font-size:13px;color:var(--text-muted);margin-top:4px;">🏥 ${r.center_name}</div></div>`).join('');
+}
+
+async function saveRadiology(){
+  const patient_name=document.getElementById('r-patient').value.trim();
+  const scan_type=document.getElementById('r-scan').value.trim();
+  if(!patient_name||!scan_type){toast('⚠️ الاسم ونوع الأشعة مطلوبان',false);return;}
+  const res=await fetch(`${SURL}/rest/v1/radiology_requests`,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify({doctor_id:DR.id,patient_name,patient_age:parseInt(document.getElementById('r-age').value)||0,scan_type,center_name:document.getElementById('r-center').value.trim(),status:'pending'})});
+  if(res.ok){toast('✅ تم إرسال طلب الأشعة!');closeModal('modal-add-radiology');['r-patient','r-age','r-scan','r-center'].forEach(id=>document.getElementById(id).value='');loadRadiology();}
+  else toast('❌ خطأ في الإرسال',false);
+}
+
+function logout(){sessionStorage.removeItem('doctor');window.location.href='dr-login.html';}
+loadPatients();
+</script>
+</body>
+</html>
