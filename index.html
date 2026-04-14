@@ -80,7 +80,7 @@ input:checked+.slider:before{transform:translateX(20px);}
   <div class="nav-item active">👨‍⚕️ إدارة الأطباء</div>
   <div class="nav-item" style="opacity:.5">📊 الإحصائيات</div>
   <div class="nav-item" style="opacity:.5">💳 الاشتراكات</div>
-  <div class="sidebar-footer">Clinic Pro v1.0<br>لوحة تحكم المدير</div>
+  <div class="sidebar-footer">Clinic Pro v1.0<br>لوحة تحكم المدير<br><small style="opacity:0.6;">© عبد الله مصطفى</small></div>
 </div>
 
 <div class="main">
@@ -128,8 +128,8 @@ input:checked+.slider:before{transform:translateX(20px);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL = 'https://fxpifttulvrthvdbyj.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_v-PAdAxX73uizls_ywMpjA_DQlG3h7g';
+const SUPABASE_URL = 'https://orxjesfpxmmyqdtmfotn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeGplc2ZweG1teXFkdG1mb3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyMDMsImV4cCI6MjA5MTcxMTIwM30.KV6YOksxje-0lXofIponX08di1rIS-8v4tMQ3sraZAo';
 const BASE = 'https://clinic-pro-three.vercel.app';
 
 const { createClient } = supabase;
@@ -150,30 +150,35 @@ function setStatus(msg, type=''){
 }
 
 async function loadDoctors(){
-  const {data, error} = await db.from('doctors').select('*').order('created_at', {ascending:false});
-  if(error){
-    document.getElementById('doctors-tbody').innerHTML=`<tr><td colspan="6"><div class="empty">❌ خطأ: ${error.message}</div></td></tr>`;
-    return;
+  try {
+    const {data, error} = await db.from('doctors').select('*').order('created_at', {ascending:false});
+    if(error){
+      document.getElementById('doctors-tbody').innerHTML=`<tr><td colspan="6"><div class="empty">❌ خطأ: ${error.message}</div></td></tr>`;
+      return;
+    }
+    if(!data||!data.length){
+      document.getElementById('doctors-tbody').innerHTML=`<tr><td colspan="6"><div class="empty">👨‍⚕️ لا يوجد أطباء بعد</div></td></tr>`;
+      document.getElementById('cnt-total').textContent=0;
+      document.getElementById('cnt-active').textContent=0;
+      document.getElementById('cnt-inactive').textContent=0;
+      return;
+    }
+    document.getElementById('cnt-total').textContent=data.length;
+    document.getElementById('cnt-active').textContent=data.filter(d=>d.active).length;
+    document.getElementById('cnt-inactive').textContent=data.filter(d=>!d.active).length;
+    document.getElementById('doctors-tbody').innerHTML=data.map(d=>`
+      <tr>
+        <td><strong>${d.name}</strong></td>
+        <td>${d.specialty}</td>
+        <td><code style="background:var(--green-pale);padding:2px 8px;border-radius:6px;font-size:12px;">${d.username}</code></td>
+        <td><button class="btn btn-copy" onclick="copyDrLink('${d.slug}')">📋 نسخ</button></td>
+        <td><label class="switch"><input type="checkbox" ${d.active?'checked':''} onchange="toggleActive('${d.id}',this.checked)"><span class="slider"></span></label></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteDoctor('${d.id}','${d.name}')">🗑</button></td>
+      </tr>`).join('');
+  } catch(err) {
+    console.error('خطأ في تحميل الأطباء:', err);
+    document.getElementById('doctors-tbody').innerHTML=`<tr><td colspan="6"><div class="empty">❌ خطأ في الاتصال</div></td></tr>`;
   }
-  if(!data||!data.length){
-    document.getElementById('doctors-tbody').innerHTML=`<tr><td colspan="6"><div class="empty">👨‍⚕️ لا يوجد أطباء بعد</div></td></tr>`;
-    document.getElementById('cnt-total').textContent=0;
-    document.getElementById('cnt-active').textContent=0;
-    document.getElementById('cnt-inactive').textContent=0;
-    return;
-  }
-  document.getElementById('cnt-total').textContent=data.length;
-  document.getElementById('cnt-active').textContent=data.filter(d=>d.active).length;
-  document.getElementById('cnt-inactive').textContent=data.filter(d=>!d.active).length;
-  document.getElementById('doctors-tbody').innerHTML=data.map(d=>`
-    <tr>
-      <td><strong>${d.name}</strong></td>
-      <td>${d.specialty}</td>
-      <td><code style="background:var(--green-pale);padding:2px 8px;border-radius:6px;font-size:12px;">${d.username}</code></td>
-      <td><button class="btn btn-copy" onclick="copyDrLink('${d.slug}')">📋 نسخ</button></td>
-      <td><label class="switch"><input type="checkbox" ${d.active?'checked':''} onchange="toggleActive('${d.id}',this.checked)"><span class="slider"></span></label></td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteDoctor('${d.id}','${d.name}')">🗑</button></td>
-    </tr>`).join('');
 }
 
 async function addDoctor(){
@@ -187,23 +192,29 @@ async function addDoctor(){
   btn.disabled=true;
   setStatus('⏳ جاري الإنشاء...');
 
-  const slug=username.toLowerCase().replace(/[^a-z0-9]/g,'-');
-  const {data,error}=await db.from('doctors').insert([{name,specialty,username,password,active:true,slug}]).select();
+  try {
+    const slug=username.toLowerCase().replace(/[^a-z0-9]/g,'-');
+    const {data,error}=await db.from('doctors').insert([{name,specialty,username,password,active:true,slug}]).select();
 
-  btn.disabled=false;
-  if(error){
-    setStatus('❌ خطأ: '+error.message,'error');
-    toast('❌ '+error.message,false);
-    return;
+    btn.disabled=false;
+    if(error){
+      setStatus('❌ خطأ: '+error.message,'error');
+      toast('❌ '+error.message,false);
+      return;
+    }
+
+    const link=`${BASE}/dr-login.html?slug=${slug}`;
+    document.getElementById('link-url').textContent=link;
+    document.getElementById('link-box').classList.add('show');
+    setStatus('✅ تم إنشاء الحساب!','success');
+    toast('✅ تم إنشاء حساب الطبيب!');
+    ['f-name','f-spec','f-user','f-pass'].forEach(id=>document.getElementById(id).value='');
+    loadDoctors();
+  } catch(err) {
+    btn.disabled=false;
+    setStatus('❌ خطأ: '+err.message,'error');
+    toast('❌ خطأ في الإنشاء',false);
   }
-
-  const link=`${BASE}/dr-login.html?slug=${slug}`;
-  document.getElementById('link-url').textContent=link;
-  document.getElementById('link-box').classList.add('show');
-  setStatus('✅ تم إنشاء الحساب!','success');
-  toast('✅ تم إنشاء حساب الطبيب!');
-  ['f-name','f-spec','f-user','f-pass'].forEach(id=>document.getElementById(id).value='');
-  loadDoctors();
 }
 
 let lastLink='';
@@ -218,16 +229,24 @@ function copyDrLink(slug){
 }
 
 async function toggleActive(id,active){
-  await db.from('doctors').update({active}).eq('id',id);
-  toast(active?'✅ تم تفعيل الاشتراك':'🔴 تم إيقاف الاشتراك');
-  loadDoctors();
+  try {
+    await db.from('doctors').update({active}).eq('id',id);
+    toast(active?'✅ تم تفعيل الاشتراك':'🔴 تم إيقاف الاشتراك');
+    loadDoctors();
+  } catch(err) {
+    toast('❌ خطأ في التحديث',false);
+  }
 }
 
 async function deleteDoctor(id,name){
   if(!confirm('هل تريد حذف '+name+'؟'))return;
-  await db.from('doctors').delete().eq('id',id);
-  toast('🗑 تم الحذف');
-  loadDoctors();
+  try {
+    await db.from('doctors').delete().eq('id',id);
+    toast('🗑 تم الحذف');
+    loadDoctors();
+  } catch(err) {
+    toast('❌ خطأ في الحذف',false);
+  }
 }
 
 loadDoctors();

@@ -114,6 +114,8 @@
   }
   .inactive-msg.show{display:block;}
 
+  .copyright{text-align:center;font-size:11px;color:var(--text-muted);margin-top:20px;opacity:0.7;}
+
   @media(max-width:480px){.login-card{padding:32px 20px;}}
 </style>
 </head>
@@ -171,12 +173,14 @@
       </button>
     </div>
 
+    <div class="copyright">© عبد الله مصطفى - Clinic Pro v1.0</div>
+
   </div>
 </div>
 
 <script>
-  const SUPABASE_URL = 'https://fxpifttulvrthvdbyj.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_v-PAdAxX73uizls_ywMpjA_DQlG3h7g';
+  const SUPABASE_URL = 'https://orxjesfpxmmyqdtmfotn.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeGplc2ZweG1teXFkdG1mb3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyMDMsImV4cCI6MjA5MTcxMTIwM30.KV6YOksxje-0lXofIponX08di1rIS-8v4tMQ3sraZAo';
   const headers = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
 
   // Read slug from URL
@@ -190,18 +194,24 @@
       document.getElementById('login-form').style.display = 'none';
       return;
     }
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/doctors?slug=eq.${slug}&select=*`, { headers });
-    const data = await res.json();
-    if (!data.length) {
-      document.getElementById('doctor-badge').textContent = '❌ الطبيب غير موجود';
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/doctors?slug=eq.${slug}&select=*`, { headers });
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) {
+        document.getElementById('doctor-badge').textContent = '❌ الطبيب غير موجود';
+        document.getElementById('login-form').style.display = 'none';
+        return;
+      }
+      doctorData = data[0];
+      document.getElementById('doctor-badge').innerHTML = `👨‍⚕️ <strong>${doctorData.name}</strong> — ${doctorData.specialty}`;
+      if (!doctorData.active) {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('inactive-msg').classList.add('show');
+      }
+    } catch(err) {
+      console.error('خطأ في تحميل بيانات الطبيب:', err);
+      document.getElementById('doctor-badge').textContent = '❌ خطأ في الاتصال';
       document.getElementById('login-form').style.display = 'none';
-      return;
-    }
-    doctorData = data[0];
-    document.getElementById('doctor-badge').innerHTML = `👨‍⚕️ <strong>${doctorData.name}</strong> — ${doctorData.specialty}`;
-    if (!doctorData.active) {
-      document.getElementById('login-form').style.display = 'none';
-      document.getElementById('inactive-msg').classList.add('show');
     }
   }
 
@@ -217,7 +227,9 @@
   function showError(msg) {
     const el = document.getElementById('error-msg');
     document.getElementById('error-text').textContent = msg;
-    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+    el.classList.remove('show'); 
+    void el.offsetWidth; 
+    el.classList.add('show');
   }
 
   async function handleLogin() {
