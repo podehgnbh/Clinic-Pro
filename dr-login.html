@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clinic Pro - دخول الطبيب</title>
+<title>Clinic Pro - تسجيل الدخول</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -62,7 +62,7 @@
   }
   .brand-tagline{font-size:11px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;}
 
-  .doctor-badge{
+  .role-badge{
     background:linear-gradient(135deg,var(--green-pale),var(--green-soft));
     border:1px solid rgba(26,107,60,0.15);border-radius:12px;
     padding:12px 16px;margin-bottom:24px;text-align:center;
@@ -131,15 +131,15 @@
         <img src="1000068207.png" alt="Clinic Pro" class="logo-img" onerror="this.parentElement.innerHTML='<span style=\'font-size:36px\'>🏥</span>'">
       </div>
       <span class="brand-name">CLINIC PRO</span>
-      <span class="brand-tagline">بوابة الطبيب</span>
+      <span class="brand-tagline" id="brand-tagline">بوابة الدخول</span>
     </div>
 
-    <div class="doctor-badge" id="doctor-badge">
-      ⏳ جاري تحميل بيانات الطبيب...
+    <div class="role-badge" id="role-badge">
+      ⏳ جاري تحميل البيانات...
     </div>
 
     <div class="inactive-msg" id="inactive-msg">
-      🔴 حسابك موقف حالياً<br>
+      🔴 الحساب موقف حالياً<br>
       <small style="opacity:0.7;margin-top:4px;display:block;">تواصل مع الإدارة لتجديد الاشتراك</small>
     </div>
 
@@ -173,7 +173,7 @@
       </button>
     </div>
 
-    <div class="copyright">© عبد الله مصطفى - Clinic Pro v1.0</div>
+    <div class="copyright">© عبد الله مصطفى - Clinic Pro v1.1</div>
 
   </div>
 </div>
@@ -183,14 +183,13 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeGplc2ZweG1teXFkdG1mb3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyMDMsImV4cCI6MjA5MTcxMTIwM30.KV6YOksxje-0lXofIponX08di1rIS-8v4tMQ3sraZAo';
   const headers = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
 
-  // Read slug from URL
   const params = new URLSearchParams(window.location.search);
   const slug = params.get('slug');
-  let doctorData = null;
+  let accountData = null;
 
-  async function loadDoctor() {
+  async function loadAccount() {
     if (!slug) {
-      document.getElementById('doctor-badge').textContent = '❌ رابط غير صحيح';
+      document.getElementById('role-badge').textContent = '❌ رابط غير صحيح';
       document.getElementById('login-form').style.display = 'none';
       return;
     }
@@ -198,24 +197,34 @@
       const res = await fetch(`${SUPABASE_URL}/rest/v1/doctors?slug=eq.${slug}&select=*`, { headers });
       const data = await res.json();
       if (!Array.isArray(data) || !data.length) {
-        document.getElementById('doctor-badge').textContent = '❌ الطبيب غير موجود';
+        document.getElementById('role-badge').textContent = '❌ الحساب غير موجود';
         document.getElementById('login-form').style.display = 'none';
         return;
       }
-      doctorData = data[0];
-      document.getElementById('doctor-badge').innerHTML = `👨‍⚕️ <strong>${doctorData.name}</strong> — ${doctorData.specialty}`;
-      if (!doctorData.active) {
+      accountData = data[0];
+      
+      const roleMap = {
+        doctor: {icon: '👨‍⚕️', label: 'بوابة الطبيب', page: 'doctor.html'},
+        lab: {icon: '🔬', label: 'بوابة المختبر', page: 'lab.html'},
+        radiology: {icon: '🩻', label: 'بوابة الأشعة', page: 'radiology.html'}
+      };
+      
+      const roleInfo = roleMap[accountData.role] || roleMap.doctor;
+      document.getElementById('brand-tagline').textContent = roleInfo.label;
+      document.getElementById('role-badge').innerHTML = `${roleInfo.icon} <strong>${accountData.name}</strong> — ${accountData.specialty || ''}`;
+      
+      if (!accountData.active) {
         document.getElementById('login-form').style.display = 'none';
         document.getElementById('inactive-msg').classList.add('show');
       }
     } catch(err) {
-      console.error('خطأ في تحميل بيانات الطبيب:', err);
-      document.getElementById('doctor-badge').textContent = '❌ خطأ في الاتصال';
+      console.error(err);
+      document.getElementById('role-badge').textContent = '❌ خطأ في الاتصال';
       document.getElementById('login-form').style.display = 'none';
     }
   }
 
-  loadDoctor();
+  loadAccount();
 
   let passVisible = false;
   function togglePass() {
@@ -233,7 +242,7 @@
   }
 
   async function handleLogin() {
-    if (!doctorData) return;
+    if (!accountData) return;
     const u = document.getElementById('username').value.trim();
     const p = document.getElementById('password').value.trim();
     if (!u||!p) { showError('يرجى ملء جميع الحقول'); return; }
@@ -242,10 +251,10 @@
     btn.classList.add('loading');
 
     setTimeout(() => {
-      if (u === doctorData.username && p === doctorData.password) {
-        // Save to sessionStorage and redirect
-        sessionStorage.setItem('doctor', JSON.stringify(doctorData));
-        window.location.href = `doctor.html`;
+      if (u === accountData.username && p === accountData.password) {
+        sessionStorage.setItem('doctor', JSON.stringify(accountData));
+        const roleMap = {doctor: 'doctor.html', lab: 'lab.html', radiology: 'radiology.html'};
+        window.location.href = roleMap[accountData.role] || 'doctor.html';
       } else {
         btn.classList.remove('loading');
         showError('اسم المستخدم أو كلمة المرور غير صحيحة');

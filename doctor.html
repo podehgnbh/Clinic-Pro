@@ -54,7 +54,8 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
 .btn-ghost:hover{background:var(--green-soft);}
 .btn-danger{background:var(--red-pale);color:var(--red);border:1px solid rgba(229,57,53,.15);}
 .btn-danger:hover{background:var(--red);color:#fff;}
-.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+.btn-ai{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#fff;box-shadow:0 4px 14px rgba(201,168,76,.3);}
+.btn-ai:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(201,168,76,.4);}
 
 .main{margin-right:var(--sidebar-w);margin-top:62px;padding:24px;min-height:calc(100vh - 62px);}
 .page{display:none;}
@@ -91,11 +92,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
 .date-label{font-size:10px;color:var(--text-muted);display:block;margin-bottom:3px;}
 .date-val{font-size:12px;font-weight:700;color:var(--text-dark);}
 
-.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
-.empty-icon{font-size:56px;margin-bottom:14px;}
-.empty-title{font-size:18px;font-weight:700;color:var(--text-dark);margin-bottom:6px;}
-.empty-sub{font-size:13px;margin-bottom:20px;}
-
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
 .modal-overlay.show{opacity:1;pointer-events:all;}
 .modal{background:var(--white);border-radius:24px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.2);transform:scale(.95) translateY(20px);transition:all .3s cubic-bezier(.34,1.56,.64,1);position:relative;}
@@ -109,17 +105,15 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
 .form-group{display:flex;flex-direction:column;gap:6px;}
 .form-group.full{grid-column:1/-1;}
 .form-label{font-size:11.5px;font-weight:700;color:var(--text-mid);letter-spacing:1px;text-transform:uppercase;}
-.form-input,.form-textarea{background:var(--green-pale);border:1.5px solid rgba(26,107,60,.12);border-radius:11px;padding:11px 14px;color:var(--text-dark);font-family:'Tajawal',sans-serif;font-size:14px;outline:none;transition:all .3s;width:100%;}
+.form-input,.form-textarea,.form-select{background:var(--green-pale);border:1.5px solid rgba(26,107,60,.12);border-radius:11px;padding:11px 14px;color:var(--text-dark);font-family:'Tajawal',sans-serif;font-size:14px;outline:none;transition:all .3s;width:100%;}
 .form-textarea{resize:vertical;min-height:80px;}
-.form-input:focus,.form-textarea:focus{border-color:var(--green-light);background:#fff;box-shadow:0 0 0 3px rgba(58,158,101,.10);}
-.form-input::placeholder,.form-textarea::placeholder{color:var(--text-muted);}
-.modal-footer{padding:16px 28px 24px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--green-light);background:#fff;box-shadow:0 0 0 3px rgba(58,158,101,.10);}
 
-.detail-section{margin-bottom:20px;}
-.detail-section-title{font-size:12px;font-weight:700;color:var(--text-mid);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
-.detail-row{display:flex;gap:8px;margin-bottom:8px;}
-.detail-key{font-size:13px;color:var(--text-muted);min-width:120px;flex-shrink:0;}
-.detail-val{font-size:13px;font-weight:600;color:var(--text-dark);}
+.ai-box{background:linear-gradient(135deg,var(--gold-pale),#fff);border:1.5px solid var(--gold-light);border-radius:16px;padding:18px;margin-top:16px;display:none;position:relative;overflow:hidden;}
+.ai-box.show{display:block;animation:slideUp 0.4s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.ai-box::before{content:'🤖 AI Analysis';position:absolute;top:0;left:0;background:var(--gold);color:#fff;font-size:10px;padding:2px 10px;border-bottom-right-radius:10px;font-weight:700;}
+.ai-content{font-size:13px;line-height:1.6;color:var(--text-dark);margin-top:10px;}
 
 .request-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px var(--shadow);}
 .request-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
@@ -181,7 +175,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
 </div>
 
 <div class="main">
-
   <!-- PATIENTS -->
   <div class="page active" id="page-patients">
     <div class="stats-grid">
@@ -214,15 +207,9 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
     </div>
     <div id="radiology-list"></div>
   </div>
-
-  <!-- REPORTS -->
-  <div class="page" id="page-reports">
-    <div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">التقارير قريباً</div></div>
-  </div>
-
 </div>
 
-<!-- ADD PATIENT MODAL -->
+<!-- MODALS -->
 <div class="modal-overlay" id="modal-add-patient">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">➕ إضافة مريض جديد</div><button class="modal-close" onclick="closeModal('modal-add-patient')">✕</button></div>
@@ -244,19 +231,23 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
   </div>
 </div>
 
-<!-- VIEW PATIENT MODAL -->
 <div class="modal-overlay" id="modal-view-patient">
   <div class="modal">
     <div class="modal-header"><div class="modal-title" id="view-title">ملف المريض</div><button class="modal-close" onclick="closeModal('modal-view-patient')">✕</button></div>
-    <div class="modal-body" id="view-body"></div>
+    <div class="modal-body">
+      <div id="view-body"></div>
+      <div id="ai-section" class="ai-box">
+        <div class="ai-content" id="ai-content">جاري تحليل البيانات بالذكاء الاصطناعي...</div>
+      </div>
+    </div>
     <div class="modal-footer">
+      <button class="btn btn-ai" id="btn-ai" onclick="analyzeWithAI()">🤖 مراجعة بالذكاء الاصطناعي</button>
       <button class="btn btn-danger btn-sm" id="btn-delete">🗑 حذف</button>
       <button class="btn btn-ghost" onclick="closeModal('modal-view-patient')">إغلاق</button>
     </div>
   </div>
 </div>
 
-<!-- ADD LAB MODAL -->
 <div class="modal-overlay" id="modal-add-lab">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">🔬 طلب تحليل</div><button class="modal-close" onclick="closeModal('modal-add-lab')">✕</button></div>
@@ -265,7 +256,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
         <div class="form-group"><label class="form-label">اسم المريض</label><input class="form-input" id="l-patient" placeholder="اسم المريض"></div>
         <div class="form-group"><label class="form-label">العمر</label><input class="form-input" id="l-age" type="number" placeholder="العمر"></div>
         <div class="form-group full"><label class="form-label">نوع التحليل</label><input class="form-input" id="l-test" placeholder="CBC, HbA1c, LFT..."></div>
-        <div class="form-group full"><label class="form-label">اسم المختبر</label><input class="form-input" id="l-lab" placeholder="اسم المختبر"></div>
+        <div class="form-group full"><label class="form-label">اختر المختبر</label><select class="form-select" id="l-lab"><option value="">جاري تحميل المختبرات...</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -275,7 +266,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
   </div>
 </div>
 
-<!-- ADD RADIOLOGY MODAL -->
 <div class="modal-overlay" id="modal-add-radiology">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">🩻 طلب أشعة</div><button class="modal-close" onclick="closeModal('modal-add-radiology')">✕</button></div>
@@ -284,7 +274,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
         <div class="form-group"><label class="form-label">اسم المريض</label><input class="form-input" id="r-patient" placeholder="اسم المريض"></div>
         <div class="form-group"><label class="form-label">العمر</label><input class="form-input" id="r-age" type="number" placeholder="العمر"></div>
         <div class="form-group full"><label class="form-label">نوع الأشعة</label><input class="form-input" id="r-scan" placeholder="X-Ray, CT, MRI, Echo..."></div>
-        <div class="form-group full"><label class="form-label">مركز الأشعة</label><input class="form-input" id="r-center" placeholder="اسم المركز"></div>
+        <div class="form-group full"><label class="form-label">اختر مركز الأشعة</label><select class="form-select" id="r-center"><option value="">جاري تحميل المراكز...</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -299,6 +289,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
 <script>
 const SURL='https://orxjesfpxmmyqdtmfotn.supabase.co';
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeGplc2ZweG1teXFkdG1mb3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyMDMsImV4cCI6MjA5MTcxMTIwM30.KV6YOksxje-0lXofIponX08di1rIS-8v4tMQ3sraZAo';
+const GEMINI_KEY='AIzaSyCGrFVSF3szysEgs4w3BKvKu0shBXFXgrM';
 const H={'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY};
 
 const stored=sessionStorage.getItem('doctor');
@@ -308,11 +299,15 @@ document.getElementById('sidebar-name').textContent=DR.name||'';
 document.getElementById('sidebar-spec').textContent=DR.specialty||'';
 document.getElementById('sidebar-avatar').textContent=(DR.name||'د').replace('د.','').trim()[0]||'د';
 
+// إخفاء زر AI إذا لم يكن مفعلاً من المدير
+if(!DR.ai_enabled) {
+  document.getElementById('btn-ai').style.display = 'none';
+}
+
 function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'var(--green-mid)':'#e53935';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 function openModal(id){document.getElementById(id).classList.add('show');}
-function closeModal(id){document.getElementById(id).classList.remove('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show'); document.getElementById('ai-section').classList.remove('show');}
 function openAddPatient(){openModal('modal-add-patient');}
-document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
 
 function showPage(name,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -321,32 +316,25 @@ function showPage(name,el){
   if(el)el.classList.add('active');
   const titles={patients:'ملفات المرضى',labs:'التحاليل',radiology:'الأشعة',reports:'التقارير'};
   document.getElementById('topbar-title').textContent=titles[name];
-  const btn=document.getElementById('topbar-btn');
-  btn.style.display=name==='patients'?'':'none';
-  if(name==='labs')loadLabs();
-  if(name==='radiology')loadRadiology();
+  document.getElementById('topbar-btn').style.display=name==='patients'?'':'none';
+  if(name==='labs') loadLabs();
+  if(name==='radiology') loadRadiology();
   document.getElementById('sidebar').classList.remove('open');
 }
 
 let allPatients=[];
 async function loadPatients(){
-  try {
-    const res=await fetch(`${SURL}/rest/v1/patients?doctor_id=eq.${DR.id}&order=created_at.desc`,{headers:H});
-    const data=await res.json();
-    if(!Array.isArray(data))return;
-    allPatients=data;
-    renderPatients(data);
-    const today=new Date().toISOString().split('T')[0];
-    document.getElementById('stat-total').textContent=data.length;
-    document.getElementById('stat-today').textContent=data.filter(p=>p.next_visit===today).length;
-  } catch(err) {
-    console.error('خطأ في تحميل المرضى:', err);
-  }
+  const res=await fetch(`${SURL}/rest/v1/patients?doctor_id=eq.${DR.id}&order=created_at.desc`,{headers:H});
+  const data=await res.json();
+  if(!Array.isArray(data))return;
+  allPatients=data;
+  renderPatients(data);
+  document.getElementById('stat-total').textContent=data.length;
 }
 
 function renderPatients(list){
   const grid=document.getElementById('patients-grid');
-  if(!list.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👥</div><div class="empty-title">لا يوجد مرضى بعد</div><div class="empty-sub">اضغط إضافة مريض لتسجيل أول مريض</div></div>`;return;}
+  if(!list.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👥</div><div class="empty-title">لا يوجد مرضى بعد</div></div>`;return;}
   grid.innerHTML=list.map(p=>`
     <div class="patient-card" onclick="viewPatient('${p.id}')">
       <div class="patient-header">
@@ -355,123 +343,95 @@ function renderPatients(list){
       </div>
       <div class="patient-tags">
         ${p.chronic_diseases?`<span class="tag tag-disease">🫀 ${p.chronic_diseases}</span>`:''}
-        ${p.diagnosis?`<span class="tag tag-diagnosis">📋 ${p.diagnosis.substring(0,25)}${p.diagnosis.length>25?'...':''}</span>`:''}
-      </div>
-      <div class="patient-dates">
-        <div class="date-item"><span class="date-label">آخر مراجعة</span><span class="date-val">${p.last_visit||'—'}</span></div>
-        <div class="date-item"><span class="date-label">الموعد القادم</span><span class="date-val" style="color:${p.next_visit?'var(--green-mid)':'inherit'}">${p.next_visit||'—'}</span></div>
+        ${p.diagnosis?`<span class="tag tag-diagnosis">📋 ${p.diagnosis.substring(0,25)}...</span>`:''}
       </div>
     </div>`).join('');
 }
 
-function filterPatients(){
-  const q=document.getElementById('search-input').value.toLowerCase();
-  if(!q){renderPatients(allPatients);return;}
-  renderPatients(allPatients.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.chronic_diseases||'').toLowerCase().includes(q)||(p.diagnosis||'').toLowerCase().includes(q)));
-}
-
-async function savePatient(){
-  const name=document.getElementById('p-name').value.trim();
-  const age=document.getElementById('p-age').value;
-  if(!name||!age){toast('⚠️ الاسم والعمر مطلوبان',false);return;}
-  try {
-    const body={doctor_id:DR.id,name,age:parseInt(age),chronic_diseases:document.getElementById('p-chronic').value.trim(),diagnosis:document.getElementById('p-diagnosis').value.trim(),last_visit:document.getElementById('p-last-visit').value||null,next_visit:document.getElementById('p-next-visit').value||null,notes:document.getElementById('p-notes').value.trim()};
-    const res=await fetch(`${SURL}/rest/v1/patients`,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(body)});
-    if(res.ok){toast('✅ تم حفظ ملف المريض!');closeModal('modal-add-patient');['p-name','p-age','p-chronic','p-diagnosis','p-last-visit','p-next-visit','p-notes'].forEach(id=>document.getElementById(id).value='');loadPatients();}
-    else{const e=await res.json();toast('❌ '+(e.message||'خطأ'),false);}
-  } catch(err) {
-    toast('❌ خطأ في الحفظ',false);
-  }
-}
-
+let currentPatientId = null;
 function viewPatient(id){
   const p=allPatients.find(x=>x.id===id);if(!p)return;
+  currentPatientId = id;
   document.getElementById('view-title').textContent='📋 '+p.name;
   document.getElementById('view-body').innerHTML=`
     <div class="detail-section"><div class="detail-section-title">👤 المعلومات الأساسية</div>
       <div class="detail-row"><span class="detail-key">الاسم</span><span class="detail-val">${p.name}</span></div>
       <div class="detail-row"><span class="detail-key">العمر</span><span class="detail-val">${p.age} سنة</span></div>
     </div>
-    <div class="detail-section"><div class="detail-section-title">🫀 الأمراض المزمنة</div>
-      <div style="background:var(--orange-pale);border-radius:10px;padding:12px;font-size:13px;color:var(--orange);">${p.chronic_diseases||'لا يوجد'}</div>
-    </div>
     <div class="detail-section"><div class="detail-section-title">📋 التشخيص</div>
       <div style="background:var(--blue-pale);border-radius:10px;padding:12px;font-size:13px;color:var(--blue);">${p.diagnosis||'لا يوجد'}</div>
     </div>
-    <div class="detail-section"><div class="detail-section-title">📅 المواعيد</div>
-      <div class="detail-row"><span class="detail-key">آخر مراجعة</span><span class="detail-val">${p.last_visit||'—'}</span></div>
-      <div class="detail-row"><span class="detail-key">الموعد القادم</span><span class="detail-val" style="color:var(--green-mid)">${p.next_visit||'—'}</span></div>
-    </div>
-    ${p.notes?`<div class="detail-section"><div class="detail-section-title">📝 ملاحظات</div><div style="background:var(--green-pale);border-radius:10px;padding:12px;font-size:13px;">${p.notes}</div></div>`:''}
   `;
   document.getElementById('btn-delete').onclick=()=>deletePatient(id);
   openModal('modal-view-patient');
 }
 
-async function deletePatient(id){
-  if(!confirm('هل تريد حذف هذا المريض؟'))return;
+async function analyzeWithAI() {
+  const p = allPatients.find(x => x.id === currentPatientId);
+  if(!p || !p.diagnosis) { toast('⚠️ لا يوجد تشخيص للتحليل', false); return; }
+  
+  const aiBox = document.getElementById('ai-section');
+  const aiContent = document.getElementById('ai-content');
+  aiBox.classList.add('show');
+  aiContent.innerHTML = '⏳ جاري تحليل البيانات بواسطة Gemini AI...';
+
   try {
-    await fetch(`${SURL}/rest/v1/patients?id=eq.${id}`,{method:'DELETE',headers:H});
-    toast('🗑 تم الحذف');closeModal('modal-view-patient');loadPatients();
+    const prompt = `أنت مساعد طبي ذكي. قم بمراجعة التشخيص التالي لمريض عمره ${p.age} سنة ويعاني من ${p.chronic_diseases || 'لا أمراض مزمنة'}. التشخيص الحالي هو: "${p.diagnosis}". قدم نصائح طبية مختصرة ومفيدة للطبيب للمساعدة في خطة العلاج. أجب باللغة العربية وبشكل احترافي.`;
+    
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_KEY}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
+    });
+    
+    const data = await res.json();
+    const result = data.candidates[0].content.parts[0].text;
+    aiContent.innerHTML = result.replace(/\n/g, '<br>');
   } catch(err) {
-    toast('❌ خطأ في الحذف',false);
+    aiContent.innerHTML = '❌ فشل الاتصال بالذكاء الاصطناعي. يرجى المحاولة لاحقاً.';
   }
 }
 
-async function loadLabs(){
-  try {
-    const res=await fetch(`${SURL}/rest/v1/lab_requests?doctor_id=eq.${DR.id}&order=created_at.desc`,{headers:H});
-    const data=await res.json();
-    const el=document.getElementById('labs-list');
-    if(!Array.isArray(data)||!data.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">🔬</div><div class="empty-title">لا توجد طلبات تحاليل</div></div>`;document.getElementById('stat-labs').textContent=0;return;}
-    document.getElementById('stat-labs').textContent=data.filter(d=>d.status==='pending').length;
-    el.innerHTML=data.map(r=>`<div class="request-card"><div class="request-header"><div class="request-title">🔬 ${r.test_type}</div><span class="status-badge ${r.status==='done'?'status-done':'status-pending'}">${r.status==='done'?'✅ مكتمل':'⏳ بانتظار'}</span></div><div style="font-size:13px;color:var(--text-muted);">👤 ${r.patient_name} — العمر: ${r.patient_age}</div><div style="font-size:13px;color:var(--text-muted);margin-top:4px;">🏥 ${r.lab_name}</div></div>`).join('');
-  } catch(err) {
-    console.error('خطأ في تحميل التحاليل:', err);
-  }
+async function loadProviders() {
+  const res = await fetch(`${SURL}/rest/v1/doctors?role=in.("lab","radiology")&active=eq.true`, {headers: H});
+  const data = await res.json();
+  const labs = data.filter(d => d.role === 'lab');
+  const rads = data.filter(d => d.role === 'radiology');
+  
+  document.getElementById('l-lab').innerHTML = labs.map(l => `<option value="${l.name}">${l.name}</option>`).join('') || '<option value="">لا توجد مختبرات</option>';
+  document.getElementById('r-center').innerHTML = rads.map(r => `<option value="${r.name}">${r.name}</option>`).join('') || '<option value="">لا توجد مراكز</option>';
+}
+
+async function savePatient(){
+  const name=document.getElementById('p-name').value.trim();
+  const age=document.getElementById('p-age').value;
+  if(!name||!age){toast('⚠️ الاسم والعمر مطلوبان',false);return;}
+  const body={doctor_id:DR.id,name,age:parseInt(age),chronic_diseases:document.getElementById('p-chronic').value.trim(),diagnosis:document.getElementById('p-diagnosis').value.trim(),last_visit:document.getElementById('p-last-visit').value||null,next_visit:document.getElementById('p-next-visit').value||null,notes:document.getElementById('p-notes').value.trim()};
+  const res=await fetch(`${SURL}/rest/v1/patients`,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(body)});
+  if(res.ok){toast('✅ تم الحفظ!');closeModal('modal-add-patient');loadPatients();}
 }
 
 async function saveLab(){
   const patient_name=document.getElementById('l-patient').value.trim();
   const test_type=document.getElementById('l-test').value.trim();
-  if(!patient_name||!test_type){toast('⚠️ الاسم ونوع التحليل مطلوبان',false);return;}
-  try {
-    const res=await fetch(`${SURL}/rest/v1/lab_requests`,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify({doctor_id:DR.id,patient_name,patient_age:parseInt(document.getElementById('l-age').value)||0,test_type,lab_name:document.getElementById('l-lab').value.trim(),status:'pending'})});
-    if(res.ok){toast('✅ تم إرسال طلب التحليل!');closeModal('modal-add-lab');['l-patient','l-age','l-test','l-lab'].forEach(id=>document.getElementById(id).value='');loadLabs();}
-    else toast('❌ خطأ في الإرسال',false);
-  } catch(err) {
-    toast('❌ خطأ في الإرسال',false);
-  }
-}
-
-async function loadRadiology(){
-  try {
-    const res=await fetch(`${SURL}/rest/v1/radiology_requests?doctor_id=eq.${DR.id}&order=created_at.desc`,{headers:H});
-    const data=await res.json();
-    const el=document.getElementById('radiology-list');
-    if(!Array.isArray(data)||!data.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">🩻</div><div class="empty-title">لا توجد طلبات أشعة</div></div>`;document.getElementById('stat-rad').textContent=0;return;}
-    document.getElementById('stat-rad').textContent=data.filter(d=>d.status==='pending').length;
-    el.innerHTML=data.map(r=>`<div class="request-card"><div class="request-header"><div class="request-title">🩻 ${r.scan_type}</div><span class="status-badge ${r.status==='done'?'status-done':'status-pending'}">${r.status==='done'?'✅ مكتمل':'⏳ بانتظار'}</span></div><div style="font-size:13px;color:var(--text-muted);">👤 ${r.patient_name} — العمر: ${r.patient_age}</div><div style="font-size:13px;color:var(--text-muted);margin-top:4px;">🏥 ${r.center_name}</div></div>`).join('');
-  } catch(err) {
-    console.error('خطأ في تحميل الأشعات:', err);
-  }
+  const lab_name=document.getElementById('l-lab').value;
+  if(!patient_name||!test_type||!lab_name){toast('⚠️ يرجى ملء جميع الحقول',false);return;}
+  const res=await fetch(`${SURL}/rest/v1/lab_requests`,{method:'POST',headers:H,body:JSON.stringify({doctor_id:DR.id,patient_name,patient_age:parseInt(document.getElementById('l-age').value)||0,test_type,lab_name,status:'pending'})});
+  if(res.ok){toast('✅ تم إرسال الطلب!');closeModal('modal-add-lab');}
 }
 
 async function saveRadiology(){
   const patient_name=document.getElementById('r-patient').value.trim();
   const scan_type=document.getElementById('r-scan').value.trim();
-  if(!patient_name||!scan_type){toast('⚠️ الاسم ونوع الأشعة مطلوبان',false);return;}
-  try {
-    const res=await fetch(`${SURL}/rest/v1/radiology_requests`,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify({doctor_id:DR.id,patient_name,patient_age:parseInt(document.getElementById('r-age').value)||0,scan_type,center_name:document.getElementById('r-center').value.trim(),status:'pending'})});
-    if(res.ok){toast('✅ تم إرسال طلب الأشعة!');closeModal('modal-add-radiology');['r-patient','r-age','r-scan','r-center'].forEach(id=>document.getElementById(id).value='');loadRadiology();}
-    else toast('❌ خطأ في الإرسال',false);
-  } catch(err) {
-    toast('❌ خطأ في الإرسال',false);
-  }
+  const center_name=document.getElementById('r-center').value;
+  if(!patient_name||!scan_type||!center_name){toast('⚠️ يرجى ملء جميع الحقول',false);return;}
+  const res=await fetch(`${SURL}/rest/v1/radiology_requests`,{method:'POST',headers:H,body:JSON.stringify({doctor_id:DR.id,patient_name,patient_age:parseInt(document.getElementById('r-age').value)||0,scan_type,center_name,status:'pending'})});
+  if(res.ok){toast('✅ تم إرسال الطلب!');closeModal('modal-add-radiology');}
 }
 
 function logout(){sessionStorage.removeItem('doctor');window.location.href='dr-login.html';}
 loadPatients();
+loadProviders();
 </script>
 </body>
 </html>

@@ -19,6 +19,8 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
 .nav-item:hover,.nav-item.active{background:var(--green-pale);color:var(--green-mid);border-right-color:var(--green-mid);font-weight:700;}
 .sidebar-footer{margin-top:auto;padding:14px 18px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted);text-align:center;}
 .main{margin-right:var(--sidebar-w);padding:28px;min-height:100vh;}
+.page{display:none;}
+.page.active{display:block;}
 .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
 .page-title{font-size:20px;font-weight:700;}
 .page-sub{font-size:13px;color:var(--text-muted);margin-top:3px;}
@@ -34,13 +36,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .form-group{display:flex;flex-direction:column;gap:6px;}
 .form-label{font-size:11.5px;font-weight:700;color:var(--text-mid);letter-spacing:1px;text-transform:uppercase;}
-.form-input{background:var(--green-pale);border:1.5px solid rgba(26,107,60,.12);border-radius:11px;padding:11px 14px;color:var(--text-dark);font-family:'Tajawal',sans-serif;font-size:14px;outline:none;transition:all .3s;}
-.form-input:focus{border-color:var(--green-light);background:#fff;box-shadow:0 0 0 3px rgba(58,158,101,.10);}
-.form-input::placeholder{color:var(--text-muted);}
+.form-input,.form-select{background:var(--green-pale);border:1.5px solid rgba(26,107,60,.12);border-radius:11px;padding:11px 14px;color:var(--text-dark);font-family:'Tajawal',sans-serif;font-size:14px;outline:none;transition:all .3s;}
+.form-input:focus,.form-select:focus{border-color:var(--green-light);background:#fff;box-shadow:0 0 0 3px rgba(58,158,101,.10);}
 .btn{padding:11px 22px;border:none;border-radius:11px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:7px;}
 .btn-primary{background:linear-gradient(135deg,var(--green-light),var(--green-mid));color:#fff;box-shadow:0 5px 16px rgba(26,107,60,.22);}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(26,107,60,.30);}
-.btn-primary:disabled{opacity:.6;pointer-events:none;}
 .btn-danger{background:var(--red-pale);color:var(--red);border:1px solid rgba(229,57,53,.2);}
 .btn-danger:hover{background:var(--red);color:#fff;}
 .btn-copy{background:var(--green-pale);color:var(--green-mid);border:1px solid var(--green-soft);padding:6px 12px;font-size:12px;border-radius:8px;}
@@ -53,21 +53,23 @@ th{background:var(--green-pale);color:var(--text-mid);font-size:12px;font-weight
 td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:rgba(237,247,242,.4);}
-.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
-.badge-active{background:var(--green-soft);color:var(--green-mid);}
-.badge-inactive{background:var(--red-pale);color:var(--red);}
 .switch{position:relative;display:inline-block;width:44px;height:24px;}
 .switch input{opacity:0;width:0;height:0;}
 .slider{position:absolute;cursor:pointer;inset:0;background:#ddd;border-radius:24px;transition:.3s;}
 .slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;}
 input:checked+.slider{background:var(--green-light);}
 input:checked+.slider:before{transform:translateX(20px);}
+.slider.ai:before{content:'🤖';font-size:10px;display:flex;align-items:center;justify-content:center;}
+input:checked+.slider.ai{background:var(--gold);}
 .empty{text-align:center;padding:40px;color:var(--text-muted);}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green-mid);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(26,107,60,.3);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .status-msg{font-size:13px;color:var(--text-muted);margin-top:8px;min-height:20px;}
 .status-msg.error{color:var(--red);}
 .status-msg.success{color:var(--green-mid);}
+.research-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px var(--shadow);border-right:4px solid var(--gold);}
+.research-diag{font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:6px;}
+.research-meta{font-size:12px;color:var(--text-muted);display:flex;gap:12px;}
 </style>
 </head>
 <body>
@@ -77,50 +79,71 @@ input:checked+.slider:before{transform:translateX(20px);}
     <img src="1000068207.png" onerror="this.style.display='none'">
     <div><span class="logo-text">CLINIC <span style="color:var(--gold)">PRO</span></span><span class="logo-pro">ADMIN</span></div>
   </div>
-  <div class="nav-item active">👨‍⚕️ إدارة الأطباء</div>
+  <div class="nav-item active" onclick="showPage('doctors', this)">👨‍⚕️ إدارة الحسابات</div>
+  <div class="nav-item" onclick="showPage('research', this)">🔬 البحث العلمي</div>
   <div class="nav-item" style="opacity:.5">📊 الإحصائيات</div>
-  <div class="nav-item" style="opacity:.5">💳 الاشتراكات</div>
-  <div class="sidebar-footer">Clinic Pro v1.0<br>لوحة تحكم المدير<br><small style="opacity:0.6;">© عبد الله مصطفى</small></div>
+  <div class="sidebar-footer">Clinic Pro v1.1<br>لوحة تحكم المدير<br><small style="opacity:0.6;">© عبد الله مصطفى</small></div>
 </div>
 
 <div class="main">
-  <div class="page-header">
-    <div><div class="page-title">إدارة الأطباء</div><div class="page-sub">أضف أطباء جدد وأنشئ روابط دخولهم</div></div>
-    <span class="admin-badge">👑 المدير</span>
+  <!-- PAGE: DOCTORS -->
+  <div id="page-doctors" class="page active">
+    <div class="page-header">
+      <div><div class="page-title">إدارة الحسابات</div><div class="page-sub">أضف أطباء، مختبرات، أو مراكز أشعة</div></div>
+      <span class="admin-badge">👑 المدير</span>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-icon">👨‍⚕️</div><div><div class="stat-num" id="cnt-total">0</div><div class="stat-label">إجمالي الحسابات</div></div></div>
+      <div class="stat-card"><div class="stat-icon">✅</div><div><div class="stat-num" id="cnt-active">0</div><div class="stat-label">حساب فعال</div></div></div>
+      <div class="stat-card"><div class="stat-icon">🤖</div><div><div class="stat-num" id="cnt-ai">0</div><div class="stat-label">مفعل بالذكاء</div></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">➕ إضافة حساب جديد</div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">الاسم</label><input class="form-input" id="f-name" placeholder="د. أحمد / مختبر الشفاء"></div>
+        <div class="form-group"><label class="form-label">الاختصاص / النوع</label>
+          <select class="form-select" id="f-role" onchange="updateSpecPlaceholder()">
+            <option value="doctor">طبيب</option>
+            <option value="lab">مختبر تحاليل</option>
+            <option value="radiology">مركز أشعة</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">التخصص / الوصف</label><input class="form-input" id="f-spec" placeholder="طب باطني"></div>
+        <div class="form-group"><label class="form-label">اسم المستخدم</label><input class="form-input" id="f-user" placeholder="username"></div>
+        <div class="form-group"><label class="form-label">كلمة المرور</label><input class="form-input" id="f-pass" type="password" placeholder="••••••••"></div>
+      </div>
+      <div style="margin-top:16px;display:flex;align-items:center;gap:16px;">
+        <button class="btn btn-primary" id="add-btn" onclick="addAccount()">🔗 إنشاء حساب ورابط</button>
+        <div class="status-msg" id="status-msg"></div>
+      </div>
+      <div class="link-box" id="link-box">
+        <div style="font-weight:700;color:var(--green-mid);margin-bottom:8px;">🔗 رابط الدخول:</div>
+        <div class="link-url" id="link-url"></div>
+        <button class="btn btn-copy" onclick="copyLink()">📋 نسخ الرابط</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 قائمة الحسابات</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>الاسم</th><th>النوع</th><th>اليوزر</th><th>الرابط</th><th>الاشتراك</th><th>AI 🤖</th><th>حذف</th></tr></thead>
+          <tbody id="doctors-tbody"><tr><td colspan="7"><div class="empty">⏳ جاري التحميل...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-icon">👨‍⚕️</div><div><div class="stat-num" id="cnt-total">0</div><div class="stat-label">إجمالي الأطباء</div></div></div>
-    <div class="stat-card"><div class="stat-icon">✅</div><div><div class="stat-num" id="cnt-active">0</div><div class="stat-label">اشتراك فعال</div></div></div>
-    <div class="stat-card"><div class="stat-icon">❌</div><div><div class="stat-num" id="cnt-inactive">0</div><div class="stat-label">اشتراك موقف</div></div></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">➕ إضافة طبيب جديد</div>
-    <div class="form-grid">
-      <div class="form-group"><label class="form-label">اسم الطبيب</label><input class="form-input" id="f-name" placeholder="د. أحمد الكريمي"></div>
-      <div class="form-group"><label class="form-label">الاختصاص</label><input class="form-input" id="f-spec" placeholder="طب باطني"></div>
-      <div class="form-group"><label class="form-label">اسم المستخدم</label><input class="form-input" id="f-user" placeholder="dr.ahmed"></div>
-      <div class="form-group"><label class="form-label">كلمة المرور</label><input class="form-input" id="f-pass" type="password" placeholder="••••••••"></div>
+  <!-- PAGE: RESEARCH -->
+  <div id="page-research" class="page">
+    <div class="page-header">
+      <div><div class="page-title">البحث العلمي</div><div class="page-sub">تجميع كافة التشخيصات الطبية للأغراض البحثية</div></div>
     </div>
-    <div style="margin-top:16px;display:flex;align-items:center;gap:16px;">
-      <button class="btn btn-primary" id="add-btn" onclick="addDoctor()">🔗 إنشاء حساب ورابط</button>
-      <div class="status-msg" id="status-msg"></div>
-    </div>
-    <div class="link-box" id="link-box">
-      <div style="font-weight:700;color:var(--green-mid);margin-bottom:8px;">🔗 رابط الطبيب:</div>
-      <div class="link-url" id="link-url"></div>
-      <button class="btn btn-copy" onclick="copyLink()">📋 نسخ الرابط</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">📋 قائمة الأطباء</div>
-    <div style="overflow-x:auto;">
-      <table>
-        <thead><tr><th>الاسم</th><th>الاختصاص</th><th>اليوزر</th><th>الرابط</th><th>الاشتراك</th><th>حذف</th></tr></thead>
-        <tbody id="doctors-tbody"><tr><td colspan="6"><div class="empty">⏳ جاري التحميل...</div></td></tr></tbody>
-      </table>
+    <div class="card">
+      <div class="card-title">🔬 سجل التشخيصات العام</div>
+      <div id="research-list"><div class="empty">⏳ جاري تحميل البيانات...</div></div>
     </div>
   </div>
 </div>
@@ -130,7 +153,7 @@ input:checked+.slider:before{transform:translateX(20px);}
 <script>
 const SUPABASE_URL = 'https://orxjesfpxmmyqdtmfotn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeGplc2ZweG1teXFkdG1mb3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyMDMsImV4cCI6MjA5MTcxMTIwM30.KV6YOksxje-0lXofIponX08di1rIS-8v4tMQ3sraZAo';
-const BASE = 'https://clinic-pro-three.vercel.app';
+const BASE = window.location.origin;
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -149,44 +172,64 @@ function setStatus(msg, type=''){
   el.className='status-msg '+(type||'');
 }
 
-async function loadDoctors(){
+function showPage(pageId, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  el.classList.add('active');
+  if(pageId === 'research') loadResearch();
+  if(pageId === 'doctors') loadAccounts();
+}
+
+function updateSpecPlaceholder() {
+  const role = document.getElementById('f-role').value;
+  const spec = document.getElementById('f-spec');
+  if(role === 'doctor') spec.placeholder = 'طب باطني';
+  else if(role === 'lab') spec.placeholder = 'مختبر تحاليل تخصصي';
+  else spec.placeholder = 'مركز أشعة وسونار';
+}
+
+async function loadAccounts(){
   try {
     const {data, error} = await db.from('doctors').select('*').order('created_at', {ascending:false});
-    if(error){
-      document.getElementById('doctors-tbody').innerHTML=`<tr><td colspan="6"><div class="empty">❌ خطأ: ${error.message}</div></td></tr>`;
+    if(error) throw error;
+    
+    const tbody = document.getElementById('doctors-tbody');
+    if(!data || !data.length) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty">لا توجد حسابات بعد</div></td></tr>`;
       return;
     }
-    if(!data||!data.length){
-      document.getElementById('doctors-tbody').innerHTML=`<tr><td colspan="6"><div class="empty">👨‍⚕️ لا يوجد أطباء بعد</div></td></tr>`;
-      document.getElementById('cnt-total').textContent=0;
-      document.getElementById('cnt-active').textContent=0;
-      document.getElementById('cnt-inactive').textContent=0;
-      return;
-    }
-    document.getElementById('cnt-total').textContent=data.length;
-    document.getElementById('cnt-active').textContent=data.filter(d=>d.active).length;
-    document.getElementById('cnt-inactive').textContent=data.filter(d=>!d.active).length;
-    document.getElementById('doctors-tbody').innerHTML=data.map(d=>`
+
+    document.getElementById('cnt-total').textContent = data.length;
+    document.getElementById('cnt-active').textContent = data.filter(d => d.active).length;
+    document.getElementById('cnt-ai').textContent = data.filter(d => d.ai_enabled).length;
+
+    const roleMap = {doctor: '👨‍⚕️ طبيب', lab: '🔬 مختبر', radiology: '🩻 أشعة'};
+
+    tbody.innerHTML = data.map(d => `
       <tr>
-        <td><strong>${d.name}</strong></td>
-        <td>${d.specialty}</td>
-        <td><code style="background:var(--green-pale);padding:2px 8px;border-radius:6px;font-size:12px;">${d.username}</code></td>
+        <td><strong>${d.name}</strong><br><small style="color:var(--text-muted)">${d.specialty || ''}</small></td>
+        <td><span class="badge">${roleMap[d.role] || d.role}</span></td>
+        <td><code>${d.username}</code></td>
         <td><button class="btn btn-copy" onclick="copyDrLink('${d.slug}')">📋 نسخ</button></td>
         <td><label class="switch"><input type="checkbox" ${d.active?'checked':''} onchange="toggleActive('${d.id}',this.checked)"><span class="slider"></span></label></td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteDoctor('${d.id}','${d.name}')">🗑</button></td>
+        <td>${d.role==='doctor' ? `<label class="switch"><input type="checkbox" ${d.ai_enabled?'checked':''} onchange="toggleAI('${d.id}',this.checked)"><span class="slider ai"></span></label>` : '—'}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteAccount('${d.id}','${d.name}')">🗑</button></td>
       </tr>`).join('');
   } catch(err) {
-    console.error('خطأ في تحميل الأطباء:', err);
-    document.getElementById('doctors-tbody').innerHTML=`<tr><td colspan="6"><div class="empty">❌ خطأ في الاتصال</div></td></tr>`;
+    console.error(err);
+    toast('❌ خطأ في تحميل البيانات', false);
   }
 }
 
-async function addDoctor(){
+async function addAccount(){
   const name=document.getElementById('f-name').value.trim();
+  const role=document.getElementById('f-role').value;
   const specialty=document.getElementById('f-spec').value.trim();
   const username=document.getElementById('f-user').value.trim();
   const password=document.getElementById('f-pass').value.trim();
-  if(!name||!specialty||!username||!password){setStatus('⚠️ ملء جميع الحقول مطلوب','error');return;}
+  
+  if(!name||!username||!password){setStatus('⚠️ الاسم واليوزر والباسورد مطلوبة','error');return;}
 
   const btn=document.getElementById('add-btn');
   btn.disabled=true;
@@ -194,33 +237,72 @@ async function addDoctor(){
 
   try {
     const slug=username.toLowerCase().replace(/[^a-z0-9]/g,'-');
-    const {data,error}=await db.from('doctors').insert([{name,specialty,username,password,active:true,slug}]).select();
+    const {data,error}=await db.from('doctors').insert([{name,role,specialty,username,password,active:true,slug,ai_enabled:false}]).select();
 
     btn.disabled=false;
-    if(error){
-      setStatus('❌ خطأ: '+error.message,'error');
-      toast('❌ '+error.message,false);
-      return;
-    }
+    if(error) throw error;
 
     const link=`${BASE}/dr-login.html?slug=${slug}`;
     document.getElementById('link-url').textContent=link;
     document.getElementById('link-box').classList.add('show');
     setStatus('✅ تم إنشاء الحساب!','success');
-    toast('✅ تم إنشاء حساب الطبيب!');
+    toast('✅ تم إنشاء الحساب بنجاح!');
     ['f-name','f-spec','f-user','f-pass'].forEach(id=>document.getElementById(id).value='');
-    loadDoctors();
+    loadAccounts();
   } catch(err) {
     btn.disabled=false;
     setStatus('❌ خطأ: '+err.message,'error');
-    toast('❌ خطأ في الإنشاء',false);
   }
 }
 
-let lastLink='';
+async function toggleActive(id,active){
+  await db.from('doctors').update({active}).eq('id',id);
+  toast(active?'✅ تم التفعيل':'🔴 تم الإيقاف');
+  loadAccounts();
+}
+
+async function toggleAI(id,ai_enabled){
+  await db.from('doctors').update({ai_enabled}).eq('id',id);
+  toast(ai_enabled?'🤖 تم تفعيل الذكاء الاصطناعي':'⚪ تم إيقاف الذكاء الاصطناعي');
+  loadAccounts();
+}
+
+async function deleteAccount(id,name){
+  if(!confirm('هل تريد حذف '+name+'؟'))return;
+  await db.from('doctors').delete().eq('id',id);
+  toast('🗑 تم الحذف');
+  loadAccounts();
+}
+
+async function loadResearch() {
+  try {
+    const {data, error} = await db.from('patients').select('diagnosis, created_at, doctor_id(name, specialty)').not('diagnosis', 'is', null).order('created_at', {ascending:false});
+    if(error) throw error;
+    
+    const list = document.getElementById('research-list');
+    if(!data || !data.length) {
+      list.innerHTML = `<div class="empty">لا توجد تشخيصات مسجلة بعد</div>`;
+      return;
+    }
+
+    list.innerHTML = data.map(r => `
+      <div class="research-card">
+        <div class="research-diag">${r.diagnosis}</div>
+        <div class="research-meta">
+          <span>👨‍⚕️ الطبيب: ${r.doctor_id?.name || 'غير معروف'}</span>
+          <span>📅 التاريخ: ${new Date(r.created_at).toLocaleDateString('ar-EG')}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch(err) {
+    console.error(err);
+    toast('❌ خطأ في تحميل سجل البحث', false);
+  }
+}
+
 function copyLink(){
-  lastLink=document.getElementById('link-url').textContent;
-  navigator.clipboard.writeText(lastLink).then(()=>toast('✅ تم نسخ الرابط!'));
+  const link=document.getElementById('link-url').textContent;
+  navigator.clipboard.writeText(link).then(()=>toast('✅ تم نسخ الرابط!'));
 }
 
 function copyDrLink(slug){
@@ -228,28 +310,7 @@ function copyDrLink(slug){
   navigator.clipboard.writeText(link).then(()=>toast('✅ تم نسخ الرابط!'));
 }
 
-async function toggleActive(id,active){
-  try {
-    await db.from('doctors').update({active}).eq('id',id);
-    toast(active?'✅ تم تفعيل الاشتراك':'🔴 تم إيقاف الاشتراك');
-    loadDoctors();
-  } catch(err) {
-    toast('❌ خطأ في التحديث',false);
-  }
-}
-
-async function deleteDoctor(id,name){
-  if(!confirm('هل تريد حذف '+name+'؟'))return;
-  try {
-    await db.from('doctors').delete().eq('id',id);
-    toast('🗑 تم الحذف');
-    loadDoctors();
-  } catch(err) {
-    toast('❌ خطأ في الحذف',false);
-  }
-}
-
-loadDoctors();
+loadAccounts();
 </script>
 </body>
 </html>

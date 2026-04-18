@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinic Pro - بوابة الأشعة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green-deep:#0d4a2a;--green-mid:#1a6b3c;--green-light:#3a9e65;
+  --green-pale:#edf7f2;--green-soft:#d4eddf;
+  --gold:#c9a84c;--gold-light:#e8cc7a;--gold-dim:#9a7830;
+  --red:#e53935;--red-pale:#fff0f0;
+  --purple:#7b1fa2;--purple-pale:#f3e5f5;
+  --white:#ffffff;--bg:#f4f9f6;
+  --text-dark:#0d3320;--text-mid:#2e6647;--text-muted:#7aaa8e;
+  --border:rgba(26,107,60,0.10);--shadow:rgba(26,107,60,0.08);
+  --sidebar-w:220px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark);min-height:100vh;}
+
+.sidebar{position:fixed;top:0;right:0;width:var(--sidebar-w);height:100vh;background:var(--white);border-left:1px solid var(--border);box-shadow:-2px 0 16px var(--shadow);display:flex;flex-direction:column;z-index:100;}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sidebar-logo img{width:34px;height:34px;object-fit:contain;}
+.logo-text{font-size:15px;font-weight:900;color:var(--green-deep);}
+.logo-pro{color:var(--gold);font-size:11px;display:block;letter-spacing:2px;font-weight:700;}
+
+.rad-card-sidebar{margin:12px;background:linear-gradient(135deg,var(--purple),#4a148c);border-radius:14px;padding:14px;color:#fff;}
+.rad-avatar-sm{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:8px;}
+.rad-name-sm{font-size:13px;font-weight:700;}
+.rad-spec-sm{font-size:11px;opacity:.7;margin-top:2px;}
+
+.nav-item{display:flex;align-items:center;gap:10px;padding:13px 18px;color:var(--text-muted);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .2s;border-right:3px solid transparent;}
+.nav-item:hover,.nav-item.active{background:var(--green-pale);color:var(--green-mid);border-right-color:var(--green-mid);font-weight:700;}
+
+.sidebar-footer{margin-top:auto;padding:14px 18px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted);text-align:center;}
+
+.main{margin-right:var(--sidebar-w);padding:28px;min-height:100vh;}
+
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.page-title{font-size:20px;font-weight:700;}
+.page-sub{font-size:13px;color:var(--text-muted);margin-top:3px;}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 2px 12px var(--shadow);display:flex;align-items:center;gap:14px;}
+.stat-icon{font-size:28px;}
+.stat-num{font-size:28px;font-weight:900;color:var(--purple);}
+.stat-label{font-size:12px;color:var(--text-muted);margin-top:3px;}
+
+.card{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:0 4px 20px var(--shadow);margin-bottom:20px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:3px;background:linear-gradient(90deg,transparent,var(--gold-light),var(--gold),var(--gold-light),transparent);}
+.card-title{font-size:15px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+
+.request-card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px var(--shadow);border-right:4px solid var(--purple);}
+.request-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.request-title{font-size:14px;font-weight:700;color:var(--text-dark);}
+.request-meta{font-size:12px;color:var(--text-muted);display:flex;gap:12px;margin-bottom:10px;}
+.status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+.status-pending{background:var(--purple-pale);color:var(--purple);}
+.status-done{background:var(--green-soft);color:var(--green-mid);}
+
+.btn{padding:11px 22px;border:none;border-radius:11px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:7px;}
+.btn-primary{background:linear-gradient(135deg,var(--purple),#4a148c);color:#fff;box-shadow:0 5px 16px rgba(123,31,162,.22);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(123,31,162,.30);}
+.btn-success{background:var(--green-soft);color:var(--green-mid);border:1px solid var(--green-light);}
+.btn-success:hover{background:var(--green-light);color:#fff;}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.form-label{font-size:11.5px;font-weight:700;color:var(--text-mid);letter-spacing:1px;text-transform:uppercase;}
+.form-input,.form-textarea{background:var(--green-pale);border:1.5px solid rgba(26,107,60,.12);border-radius:11px;padding:11px 14px;color:var(--text-dark);font-family:'Tajawal',sans-serif;font-size:14px;outline:none;transition:all .3s;width:100%;}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-input:focus,.form-textarea:focus{border-color:var(--green-light);background:#fff;box-shadow:0 0 0 3px rgba(58,158,101,.10);}
+
+.empty{text-align:center;padding:40px;color:var(--text-muted);}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green-mid);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(26,107,60,.3);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--white);border-radius:24px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.2);transform:scale(.95) translateY(20px);transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.modal-overlay.show .modal{transform:scale(1) translateY(0);}
+.modal-header{padding:24px 28px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.modal-title{font-size:18px;font-weight:700;color:var(--text-dark);}
+.modal-close{width:34px;height:34px;border-radius:50%;border:none;background:var(--green-pale);color:var(--green-mid);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.modal-close:hover{background:var(--red-pale);color:var(--red);}
+.modal-body{padding:24px 28px;}
+.modal-footer{padding:16px 28px 24px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <img src="1000068207.png" onerror="this.style.display='none'">
+    <div><span class="logo-text">CLINIC <span style="color:var(--gold)">PRO</span></span><span class="logo-pro">RAD</span></div>
+  </div>
+  <div class="rad-card-sidebar">
+    <div class="rad-avatar-sm">🩻</div>
+    <div class="rad-name-sm" id="rad-name">مركز الأشعة</div>
+    <div class="rad-spec-sm" id="rad-spec">تصوير طبي</div>
+  </div>
+  <div style="padding:10px 0;">
+    <div class="nav-item active" onclick="showSection('pending')">📋 الطلبات المعلقة</div>
+    <div class="nav-item" onclick="showSection('completed')">✅ الطلبات المكتملة</div>
+  </div>
+  <div class="sidebar-footer">
+    Clinic Pro v1.1<br>بوابة الأشعة<br><button class="btn btn-sm" onclick="logout()" style="margin-top:8px;width:100%;background:var(--red-pale);color:var(--red);border:none;">🚪 خروج</button>
+    <small style="opacity:0.6;margin-top:8px;display:block;">© عبد الله مصطفى</small>
+  </div>
+</div>
+
+<div class="main">
+  <div class="page-header">
+    <div><div class="page-title">🩻 بوابة الأشعة</div><div class="page-sub">إدارة طلبات التصوير والنتائج</div></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-icon">📋</div><div><div class="stat-num" id="cnt-pending">0</div><div class="stat-label">طلبات معلقة</div></div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div><div class="stat-num" id="cnt-completed">0</div><div class="stat-label">طلبات مكتملة</div></div></div>
+    <div class="stat-card"><div class="stat-icon">📊</div><div><div class="stat-num" id="cnt-total">0</div><div class="stat-label">إجمالي الطلبات</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 الطلبات المعلقة</div>
+    <div id="pending-list"><div class="empty">⏳ جاري تحميل الطلبات...</div></div>
+  </div>
+
+  <div class="card" style="display:none;" id="completed-section">
+    <div class="card-title">✅ الطلبات المكتملة</div>
+    <div id="completed-list"><div class="empty">لا توجد طلبات مكتملة</div></div>
+  </div>
+</div>
+
+<!-- MODAL: UPLOAD RESULT -->
+<div class="modal-overlay" id="modal-upload">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📤 رفع نتيجة الأشعة</div><button class="modal-close" onclick="closeModal('modal-upload')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">اسم المريض</label>
+        <input class="form-input" id="result-patient" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">نوع الأشعة</label>
+        <input class="form-input" id="result-scan" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">النتيجة / الملاحظات</label>
+        <textarea class="form-textarea" id="result-text" placeholder="أدخل نتيجة الأشعة والملاحظات الطبية..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-upload')" style="background:var(--green-pale);color:var(--green-mid);">إلغاء</button>
+      <button class="btn btn-success" onclick="submitResult()">✅ تأكيد النتيجة</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SURL='https://orxjesfpxmmyqdtmfotn.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeGplc2ZweG1teXFkdG1mb3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyMDMsImV4cCI6MjA5MTcxMTIwM30.KV6YOksxje-0lXofIponX08di1rIS-8v4tMQ3sraZAo';
+const H={'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY};
+
+const stored=sessionStorage.getItem('doctor');
+if(!stored){window.location.href='dr-login.html';}
+const RAD=JSON.parse(stored||'{}');
+document.getElementById('rad-name').textContent=RAD.name||'مركز الأشعة';
+document.getElementById('rad-spec').textContent=RAD.specialty||'تصوير طبي';
+
+let currentRequestId = null;
+
+function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'var(--green-mid)':'#e53935';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+
+function showSection(section) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('completed-section').style.display = section === 'completed' ? 'block' : 'none';
+  if(section === 'completed') loadCompleted();
+}
+
+async function loadRequests() {
+  try {
+    const res = await fetch(`${SURL}/rest/v1/radiology_requests?center_name=eq.${RAD.name}&status=eq.pending&order=created_at.desc`, {headers: H});
+    const data = await res.json();
+    
+    const list = document.getElementById('pending-list');
+    if(!data || !data.length) {
+      list.innerHTML = '<div class="empty">✅ لا توجد طلبات معلقة</div>';
+      document.getElementById('cnt-pending').textContent = 0;
+      return;
+    }
+
+    document.getElementById('cnt-pending').textContent = data.length;
+    list.innerHTML = data.map(r => `
+      <div class="request-card">
+        <div class="request-header">
+          <div class="request-title">🩻 ${r.scan_type}</div>
+          <span class="status-badge status-pending">⏳ معلق</span>
+        </div>
+        <div class="request-meta">
+          <span>👤 ${r.patient_name}</span>
+          <span>📅 ${new Date(r.created_at).toLocaleDateString('ar-EG')}</span>
+          <span>👨‍⚕️ الطبيب: ${r.doctor_id?.name || 'غير معروف'}</span>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openUploadModal('${r.id}', '${r.patient_name}', '${r.scan_type}')">📤 رفع النتيجة</button>
+      </div>
+    `).join('');
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+async function loadCompleted() {
+  try {
+    const res = await fetch(`${SURL}/rest/v1/radiology_requests?center_name=eq.${RAD.name}&status=eq.done&order=created_at.desc`, {headers: H});
+    const data = await res.json();
+    
+    const list = document.getElementById('completed-list');
+    if(!data || !data.length) {
+      list.innerHTML = '<div class="empty">لا توجد طلبات مكتملة</div>';
+      document.getElementById('cnt-completed').textContent = 0;
+      return;
+    }
+
+    document.getElementById('cnt-completed').textContent = data.length;
+    list.innerHTML = data.map(r => `
+      <div class="request-card">
+        <div class="request-header">
+          <div class="request-title">🩻 ${r.scan_type}</div>
+          <span class="status-badge status-done">✅ مكتمل</span>
+        </div>
+        <div class="request-meta">
+          <span>👤 ${r.patient_name}</span>
+          <span>📅 ${new Date(r.created_at).toLocaleDateString('ar-EG')}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+function openUploadModal(id, patient, scan) {
+  currentRequestId = id;
+  document.getElementById('result-patient').value = patient;
+  document.getElementById('result-scan').value = scan;
+  document.getElementById('result-text').value = '';
+  openModal('modal-upload');
+}
+
+async function submitResult() {
+  const text = document.getElementById('result-text').value.trim();
+  if(!text) { toast('⚠️ يرجى إدخال النتيجة', false); return; }
+  
+  try {
+    await fetch(`${SURL}/rest/v1/radiology_requests?id=eq.${currentRequestId}`, {
+      method: 'PATCH',
+      headers: H,
+      body: JSON.stringify({status: 'done'})
+    });
+    
+    toast('✅ تم رفع النتيجة بنجاح!');
+    closeModal('modal-upload');
+    loadRequests();
+    loadStats();
+  } catch(err) {
+    toast('❌ خطأ في الرفع', false);
+  }
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch(`${SURL}/rest/v1/radiology_requests?center_name=eq.${RAD.name}`, {headers: H});
+    const data = await res.json();
+    const pending = data.filter(r => r.status === 'pending').length;
+    const completed = data.filter(r => r.status === 'done').length;
+    
+    document.getElementById('cnt-pending').textContent = pending;
+    document.getElementById('cnt-completed').textContent = completed;
+    document.getElementById('cnt-total').textContent = data.length;
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+function logout(){sessionStorage.removeItem('doctor');window.location.href='dr-login.html';}
+
+loadRequests();
+loadStats();
+</script>
+</body>
+</html>
