@@ -385,8 +385,12 @@ async function analyzeWithAI() {
     });
     
     const data = await res.json();
-    const result = data.candidates[0].content.parts[0].text;
-    aiContent.innerHTML = result.replace(/\n/g, '<br>');
+    if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+      const result = data.candidates[0].content.parts[0].text;
+      aiContent.innerHTML = result.replace(/\n/g, '<br>');
+    } else {
+      throw new Error('Invalid AI response structure');
+    }
   } catch(err) {
     aiContent.innerHTML = '❌ فشل الاتصال بالذكاء الاصطناعي. يرجى المحاولة لاحقاً.';
   }
@@ -395,6 +399,7 @@ async function analyzeWithAI() {
 async function loadProviders() {
   const res = await fetch(`${SURL}/rest/v1/doctors?role=in.("lab","radiology")&active=eq.true`, {headers: H});
   const data = await res.json();
+  if (!Array.isArray(data)) return;
   const labs = data.filter(d => d.role === 'lab');
   const rads = data.filter(d => d.role === 'radiology');
   

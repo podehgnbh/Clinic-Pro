@@ -196,6 +196,7 @@
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/doctors?slug=eq.${slug}&select=*`, { headers });
       const data = await res.json();
+      if (!res.ok) throw new Error('Failed to fetch account');
       if (!Array.isArray(data) || !data.length) {
         document.getElementById('role-badge').textContent = '❌ الحساب غير موجود';
         document.getElementById('login-form').style.display = 'none';

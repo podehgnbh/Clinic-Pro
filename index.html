@@ -195,6 +195,7 @@ async function loadAccounts(){
     if(error) throw error;
     
     const tbody = document.getElementById('doctors-tbody');
+    if(!tbody) return;
     if(!data || !data.length) {
       tbody.innerHTML = `<tr><td colspan="7"><div class="empty">لا توجد حسابات بعد</div></td></tr>`;
       return;
@@ -280,6 +281,7 @@ async function loadResearch() {
     if(error) throw error;
     
     const list = document.getElementById('research-list');
+    if(!list) return;
     if(!data || !data.length) {
       list.innerHTML = `<div class="empty">لا توجد تشخيصات مسجلة بعد</div>`;
       return;

@@ -103,8 +103,8 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-dark
     <div class="rad-spec-sm" id="rad-spec">تصوير طبي</div>
   </div>
   <div style="padding:10px 0;">
-    <div class="nav-item active" onclick="showSection('pending')">📋 الطلبات المعلقة</div>
-    <div class="nav-item" onclick="showSection('completed')">✅ الطلبات المكتملة</div>
+    <div class="nav-item active" onclick="showSection('pending', this)">📋 الطلبات المعلقة</div>
+    <div class="nav-item" onclick="showSection('completed', this)">✅ الطلبات المكتملة</div>
   </div>
   <div class="sidebar-footer">
     Clinic Pro v1.1<br>بوابة الأشعة<br><button class="btn btn-sm" onclick="logout()" style="margin-top:8px;width:100%;background:var(--red-pale);color:var(--red);border:none;">🚪 خروج</button>
@@ -178,17 +178,18 @@ function toast(msg,ok=true){const t=document.getElementById('toast');t.textConte
 function openModal(id){document.getElementById(id).classList.add('show');}
 function closeModal(id){document.getElementById(id).classList.remove('show');}
 
-function showSection(section) {
+function showSection(section, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  event.target.classList.add('active');
+  if (el) el.classList.add('active');
   document.getElementById('completed-section').style.display = section === 'completed' ? 'block' : 'none';
   if(section === 'completed') loadCompleted();
 }
 
 async function loadRequests() {
   try {
-    const res = await fetch(`${SURL}/rest/v1/radiology_requests?center_name=eq.${RAD.name}&status=eq.pending&order=created_at.desc`, {headers: H});
+    const res = await fetch(`${SURL}/rest/v1/radiology_requests?center_name=eq.${RAD.name}&status=eq.pending&select=*,doctor_id(name)&order=created_at.desc`, {headers: H});
     const data = await res.json();
+    if (!Array.isArray(data)) return;
     
     const list = document.getElementById('pending-list');
     if(!data || !data.length) {
@@ -219,8 +220,9 @@ async function loadRequests() {
 
 async function loadCompleted() {
   try {
-    const res = await fetch(`${SURL}/rest/v1/radiology_requests?center_name=eq.${RAD.name}&status=eq.done&order=created_at.desc`, {headers: H});
+    const res = await fetch(`${SURL}/rest/v1/radiology_requests?center_name=eq.${RAD.name}&status=eq.done&select=*,doctor_id(name)&order=created_at.desc`, {headers: H});
     const data = await res.json();
+    if (!Array.isArray(data)) return;
     
     const list = document.getElementById('completed-list');
     if(!data || !data.length) {
@@ -260,11 +262,12 @@ async function submitResult() {
   if(!text) { toast('⚠️ يرجى إدخال النتيجة', false); return; }
   
   try {
-    await fetch(`${SURL}/rest/v1/radiology_requests?id=eq.${currentRequestId}`, {
+    const res = await fetch(`${SURL}/rest/v1/radiology_requests?id=eq.${currentRequestId}`, {
       method: 'PATCH',
       headers: H,
-      body: JSON.stringify({status: 'done'})
+      body: JSON.stringify({status: 'done', result: text})
     });
+    if (!res.ok) throw new Error('Failed to update');
     
     toast('✅ تم رفع النتيجة بنجاح!');
     closeModal('modal-upload');
@@ -279,6 +282,7 @@ async function loadStats() {
   try {
     const res = await fetch(`${SURL}/rest/v1/radiology_requests?center_name=eq.${RAD.name}`, {headers: H});
     const data = await res.json();
+    if (!Array.isArray(data)) return;
     const pending = data.filter(r => r.status === 'pending').length;
     const completed = data.filter(r => r.status === 'done').length;
     
