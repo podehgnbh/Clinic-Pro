@@ -135,7 +135,7 @@ input:checked + .slider:before{transform:translateX(20px);}
             </select>
         </div>
         <div style="display:flex; gap:10px; margin-top:20px;">
-            <button class="btn btn-primary" style="flex:1;" onclick="saveUser()">💾 حفظ</button>
+            <button class="btn btn-primary" id="save-btn" style="flex:1;" onclick="saveUser()">💾 حفظ</button>
             <button class="btn btn-danger" onclick="closeModal('add-modal')">إلغاء</button>
         </div>
     </div>
@@ -156,7 +156,8 @@ wakeupDB();
 setInterval(wakeupDB, 60000);
 
 async function loadDoctors() {
-    const {data} = await db.from('doctors').select('*').order('created_at', {ascending:false});
+    const {data, error} = await db.from('doctors').select('*').order('created_at', {ascending:false});
+    if(error) { console.error(error); return; }
     if(data) {
         document.getElementById('cnt-doctors').textContent = data.length;
         document.getElementById('cnt-ai').textContent = data.filter(d => d.ai_enabled).length;
@@ -179,7 +180,8 @@ async function loadDoctors() {
 }
 
 async function loadResearch() {
-    const {data} = await db.from('patient_visits').select('diagnosis_detail, created_at').order('created_at', {ascending:false});
+    const {data, error} = await db.from('patient_visits').select('diagnosis_detail, created_at').order('created_at', {ascending:false});
+    if(error) { console.error(error); return; }
     if(data) {
         document.getElementById('research-list').innerHTML = data.map(r => `
             <div class="research-card">
@@ -196,44 +198,76 @@ async function toggleAI(id, val) {
 }
 
 async function saveUser() {
-    const name = document.getElementById('new-name').value;
-    const spec = document.getElementById('new-spec').value;
-    const user = document.getElementById('new-user').value;
-    const pass = document.getElementById('new-pass').value;
+    const name = document.getElementById('new-name').value.trim();
+    const spec = document.getElementById('new-spec').value.trim();
+    const user = document.getElementById('new-user').value.trim();
+    const pass = document.getElementById('new-pass').value.trim();
     const role = document.getElementById('new-role').value;
+    const btn = document.getElementById('save-btn');
     
-    if(!name || !user || !pass) return;
+    if(!name || !user || !pass) {
+        showToast("يرجى ملء جميع الحقول المطلوبة", false);
+        return;
+    }
     
-    const {error} = await db.from('doctors').insert([{
-        name, specialty: spec, username: user, password: pass, role, slug: user, active: true
-    }]);
+    btn.disabled = true;
+    btn.textContent = "⏳ جاري الحفظ...";
     
-    if(!error) {
+    try {
+        const {data, error} = await db.from('doctors').insert([{
+            name, specialty: spec, username: user, password: pass, role, slug: user, active: true, ai_enabled: false
+        }]);
+        
+        if(error) throw error;
+        
         showToast("تمت إضافة المستخدم بنجاح");
         closeModal('add-modal');
         loadDoctors();
+        
+        // Clear fields
+        document.getElementById('new-name').value = '';
+        document.getElementById('new-spec').value = '';
+        document.getElementById('new-user').value = '';
+        document.getElementById('new-pass').value = '';
+    } catch(err) {
+        console.error(err);
+        showToast("خطأ: " + (err.message || "فشل الحفظ"), false);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "💾 حفظ";
     }
 }
 
 async function deleteUser(id) {
-    if(!confirm("حذف هذا المستخدم؟")) return;
-    await db.from('doctors').delete().eq('id', id);
-    loadDoctors();
+    if(!confirm("هل أنت متأكد من حذف هذا المستخدم؟")) return;
+    const {error} = await db.from('doctors').delete().eq('id', id);
+    if(error) showToast("فشل الحذف", false);
+    else {
+        showToast("تم الحذف بنجاح");
+        loadDoctors();
+    }
 }
 
 function showSection(sec) {
     document.getElementById('section-doctors').style.display = sec === 'doctors' ? 'block' : 'none';
     document.getElementById('section-research').style.display = sec === 'research' ? 'block' : 'none';
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    event.target.classList.add('active');
+    
+    // Find the clicked item or the one matching the section
+    const items = document.querySelectorAll('.nav-item');
+    items.forEach(item => {
+        if(item.getAttribute('onclick').includes(sec)) item.classList.add('active');
+    });
+    
     if(sec === 'research') loadResearch();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-function showToast(msg) {
+function showToast(msg, ok=true) {
     const t = document.getElementById('toast');
     t.textContent = msg;
+    t.style.background = ok ? 'var(--green-deep)' : 'var(--red)';
     t.classList.add('active');
     setTimeout(() => t.classList.remove('active'), 3000);
 }
