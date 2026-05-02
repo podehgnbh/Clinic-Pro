@@ -74,7 +74,7 @@ input:checked+.slider:before{transform:translateX(20px);}
   </div>
   <div class="nav-item active" onclick="showPage('doctors', this)">👨‍⚕️ إدارة الحسابات</div>
   <div class="nav-item" onclick="showPage('research', this)">🔬 البحث العلمي</div>
-  <div class="sidebar-footer">Clinic Pro v2.1<br>لوحة تحكم المدير<br><small style="opacity:0.6;">© عبد الله مصطفى</small></div>
+  <div class="sidebar-footer">Clinic Pro v2.2<br>لوحة تحكم المدير<br><small style="opacity:0.6;">© عبد الله مصطفى</small></div>
 </div>
 
 <div class="main">
@@ -143,8 +143,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: { persistSession: false },
-  global: { headers: { 'x-my-custom-header': 'clinic-pro' } }
+  auth: { persistSession: false, autoRefreshToken: true },
+  global: { headers: { 'apikey': SUPABASE_KEY } }
 });
 
 // استيقاظ قاعدة البيانات تلقائياً
@@ -230,15 +230,29 @@ async function addAccount(){
   const btn=document.getElementById('add-btn');
   btn.disabled=true;
   btn.textContent='⏳ جاري الإنشاء...';
-  setStatus('⏳ جاري الاتصال بقاعدة البيانات...');
+  setStatus('⏳ جاري الاتصال الآمن بقاعدة البيانات...');
 
   try {
     const slug=username.toLowerCase().replace(/[^a-z0-9]/g,'-');
-    const {data,error}=await db.from('doctors').insert([{
-      name,role,specialty,username,password,active:true,slug,ai_enabled:false
-    }]).select();
+    
+    // محاولة الإضافة مع معالجة CORS المتقدمة
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/doctors`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({
+        name, role, specialty, username, password, active: true, slug, ai_enabled: false
+      })
+    });
 
-    if(error) throw error;
+    if(!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.message || 'فشل في عملية الإضافة');
+    }
 
     setStatus('✅ تم إنشاء الحساب بنجاح!','success');
     toast('✅ تم إنشاء الحساب بنجاح!');
@@ -247,7 +261,7 @@ async function addAccount(){
   } catch(err) {
     console.error('Error details:', err);
     let msg = err.message || 'فشل الاتصال';
-    if(msg.includes('fetch')) msg = 'خطأ في الاتصال بالخادم (CORS/Network)';
+    if(msg.includes('fetch')) msg = 'خطأ في الاتصال (يرجى تفعيل CORS في Supabase)';
     setStatus('❌ خطأ: '+msg,'error');
     toast('❌ فشل الإنشاء: '+msg, false);
   } finally {
