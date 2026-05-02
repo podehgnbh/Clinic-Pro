@@ -74,7 +74,7 @@ input:checked+.slider:before{transform:translateX(20px);}
   </div>
   <div class="nav-item active" onclick="showPage('doctors', this)">👨‍⚕️ إدارة الحسابات</div>
   <div class="nav-item" onclick="showPage('research', this)">🔬 البحث العلمي</div>
-  <div class="sidebar-footer">Clinic Pro v2.0<br>لوحة تحكم المدير<br><small style="opacity:0.6;">© عبد الله مصطفى</small></div>
+  <div class="sidebar-footer">Clinic Pro v2.1<br>لوحة تحكم المدير<br><small style="opacity:0.6;">© عبد الله مصطفى</small></div>
 </div>
 
 <div class="main">
@@ -140,10 +140,12 @@ input:checked+.slider:before{transform:translateX(20px);}
 <script>
 const SUPABASE_URL = 'https://orxjesfpxmmyqdtmfotn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeGplc2ZweG1teXFkdG1mb3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyMDMsImV4cCI6MjA5MTcxMTIwM30.KV6YOksxje-0lXofIponX08di1rIS-8v4tMQ3sraZAo';
-const BASE = window.location.origin;
 
 const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: false },
+  global: { headers: { 'x-my-custom-header': 'clinic-pro' } }
+});
 
 // استيقاظ قاعدة البيانات تلقائياً
 async function wakeupDB() {
@@ -228,22 +230,26 @@ async function addAccount(){
   const btn=document.getElementById('add-btn');
   btn.disabled=true;
   btn.textContent='⏳ جاري الإنشاء...';
-  setStatus('⏳ جاري الإنشاء...');
+  setStatus('⏳ جاري الاتصال بقاعدة البيانات...');
 
   try {
     const slug=username.toLowerCase().replace(/[^a-z0-9]/g,'-');
-    const {data,error}=await db.from('doctors').insert([{name,role,specialty,username,password,active:true,slug,ai_enabled:false}]);
+    const {data,error}=await db.from('doctors').insert([{
+      name,role,specialty,username,password,active:true,slug,ai_enabled:false
+    }]).select();
 
     if(error) throw error;
 
-    setStatus('✅ تم إنشاء الحساب!','success');
+    setStatus('✅ تم إنشاء الحساب بنجاح!','success');
     toast('✅ تم إنشاء الحساب بنجاح!');
     ['f-name','f-spec','f-user','f-pass'].forEach(id=>document.getElementById(id).value='');
     loadAccounts();
   } catch(err) {
-    console.error(err);
-    setStatus('❌ خطأ: '+err.message,'error');
-    toast('❌ فشل الإنشاء: '+err.message, false);
+    console.error('Error details:', err);
+    let msg = err.message || 'فشل الاتصال';
+    if(msg.includes('fetch')) msg = 'خطأ في الاتصال بالخادم (CORS/Network)';
+    setStatus('❌ خطأ: '+msg,'error');
+    toast('❌ فشل الإنشاء: '+msg, false);
   } finally {
     btn.disabled=false;
     btn.textContent='🔗 إنشاء حساب ورابط';
