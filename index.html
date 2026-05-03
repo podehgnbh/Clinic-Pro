@@ -74,7 +74,7 @@ input:checked+.slider:before{transform:translateX(20px);}
   </div>
   <div class="nav-item active" onclick="showPage('doctors', this)">👨‍⚕️ إدارة الحسابات</div>
   <div class="nav-item" onclick="showPage('research', this)">🔬 البحث العلمي</div>
-  <div class="sidebar-footer">Clinic Pro v2.2<br>لوحة تحكم المدير<br><small style="opacity:0.6;">© عبد الله مصطفى</small></div>
+  <div class="sidebar-footer">Clinic Pro v2.3<br>لوحة تحكم المدير<br><small style="opacity:0.6;">© عبد الله مصطفى</small></div>
 </div>
 
 <div class="main">
@@ -139,13 +139,11 @@ input:checked+.slider:before{transform:translateX(20px);}
 
 <script>
 const SUPABASE_URL = 'https://orxjesfpxmmyqdtmfotn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeGplc2ZweG1teXFkdG1mb3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyMDMsImV4cCI6MjA5MTcxMTIwM30.KV6YOksxje-0lXofIponX08di1rIS-8v4tMQ3sraZAo';
+// استخدام المفتاح الجديد الذي زودنا به المستخدم
+const SUPABASE_KEY = 'sb_publishable_v-PAdAxX73uizls_ywMpjA_DQlG3h7g';
 
 const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: { persistSession: false, autoRefreshToken: true },
-  global: { headers: { 'apikey': SUPABASE_KEY } }
-});
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // استيقاظ قاعدة البيانات تلقائياً
 async function wakeupDB() {
@@ -230,29 +228,16 @@ async function addAccount(){
   const btn=document.getElementById('add-btn');
   btn.disabled=true;
   btn.textContent='⏳ جاري الإنشاء...';
-  setStatus('⏳ جاري الاتصال الآمن بقاعدة البيانات...');
+  setStatus('⏳ جاري الاتصال بالنظام الجديد...');
 
   try {
     const slug=username.toLowerCase().replace(/[^a-z0-9]/g,'-');
     
-    // محاولة الإضافة مع معالجة CORS المتقدمة
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/doctors`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      },
-      body: JSON.stringify({
-        name, role, specialty, username, password, active: true, slug, ai_enabled: false
-      })
-    });
+    const {data,error}=await db.from('doctors').insert([{
+      name,role,specialty,username,password,active:true,slug,ai_enabled:false
+    }]).select();
 
-    if(!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.message || 'فشل في عملية الإضافة');
-    }
+    if(error) throw error;
 
     setStatus('✅ تم إنشاء الحساب بنجاح!','success');
     toast('✅ تم إنشاء الحساب بنجاح!');
@@ -261,7 +246,6 @@ async function addAccount(){
   } catch(err) {
     console.error('Error details:', err);
     let msg = err.message || 'فشل الاتصال';
-    if(msg.includes('fetch')) msg = 'خطأ في الاتصال (يرجى تفعيل CORS في Supabase)';
     setStatus('❌ خطأ: '+msg,'error');
     toast('❌ فشل الإنشاء: '+msg, false);
   } finally {
