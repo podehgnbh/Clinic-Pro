@@ -16,79 +16,177 @@
         }
         * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { background: var(--bg); margin: 0; display: flex; height: 100vh; color: var(--text); }
+        
+        /* Sidebar */
         .sidebar { width: 260px; background: var(--white); border-left: 1px solid #ddd; display: flex; flex-direction: column; padding: 20px; }
         .logo { text-align: center; margin-bottom: 30px; }
         .logo h2 { color: var(--primary); margin: 0; font-size: 22px; }
         .logo span { color: var(--secondary); font-size: 12px; letter-spacing: 2px; }
         .nav-item { padding: 12px 15px; margin: 5px 0; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; color: #666; }
         .nav-item:hover, .nav-item.active { background: #e8f5e9; color: var(--primary); font-weight: 600; }
+        
+        /* Main Content */
         .main { flex: 1; padding: 30px; overflow-y: auto; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .badge { background: var(--secondary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+        
+        /* Stats */
         .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; position: relative; }
         .stat-card h3 { margin: 0; font-size: 28px; color: var(--primary); }
         .stat-card p { margin: 5px 0 0; color: #888; font-size: 14px; }
+        .stat-icon { position: absolute; top: 15px; left: 15px; font-size: 20px; opacity: 0.3; }
+
+        /* Form Card */
         .card { background: var(--white); padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; border-top: 4px solid var(--secondary); }
         .card-title { font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--primary); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #555; }
         input, select { width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f9f9f9; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); background: #fff; }
+        
         .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #143d22; transform: translateY(-2px); }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Table */
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
         th { background: #f8f9fa; padding: 15px; text-align: right; font-size: 13px; color: #777; border-bottom: 2px solid #eee; }
         td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .role-badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+        .role-doctor { background: #e3f2fd; color: #1976d2; }
+        .role-lab { background: #f3e5f5; color: #7b1fa2; }
+        .role-rad { background: #fff3e0; color: #f57c00; }
+        
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
         .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(20px); }
-        .delete-btn { color: #d32f2f; cursor: pointer; font-size: 18px; }
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 25px; border-radius: 30px; color: white; font-weight: 600; display: none; z-index: 1000; }
+
+        .action-btn { cursor: pointer; font-size: 18px; margin: 0 5px; transition: 0.3s; }
+        .action-btn:hover { transform: scale(1.2); }
+        .copy-btn { color: var(--secondary); }
+        .delete-btn { color: #d32f2f; }
+        
+        /* Copyright */
+        .copyright { text-align: center; padding: 20px; font-size: 12px; color: #aaa; }
+
+        /* Toast */
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 25px; border-radius: 30px; color: white; font-weight: 600; display: none; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
     <div id="toast"></div>
+
     <div class="sidebar">
-        <div class="logo"><h2>CLINIC PRO</h2><span>ADMIN</span></div>
+        <div class="logo">
+            <h2>CLINIC PRO</h2>
+            <span>ADMIN</span>
+        </div>
         <div class="nav-item active" onclick="showSection('accounts')">👨‍⚕️ إدارة الحسابات</div>
         <div class="nav-item" onclick="showSection('research')">🔬 البحث العلمي</div>
-        <div style="margin-top: auto; text-align: center; font-size: 12px; color: #aaa;">© عبد الله مصطفى</div>
+        <div style="margin-top: auto;" class="copyright">© عبد الله مصطفى</div>
     </div>
+
     <div class="main">
         <div id="accounts-section">
-            <div class="header"><h1>إدارة الحسابات</h1><div class="badge">👑 المدير</div></div>
-            <div class="stats">
-                <div class="stat-card"><h3 id="total-users">0</h3><p>إجمالي الحسابات</p></div>
-                <div class="stat-card"><h3 id="active-users">0</h3><p>حساب فعال</p></div>
-                <div class="stat-card"><h3 id="ai-users">0</h3><p>مفعل بالذكاء</p></div>
+            <div class="header">
+                <div>
+                    <h1 style="margin:0; font-size: 24px;">إدارة الحسابات</h1>
+                    <p style="margin:5px 0 0; color: #888; font-size: 14px;">أضف أطباء، مختبرات، أو مراكز أشعة</p>
+                </div>
+                <div class="badge">👑 المدير</div>
             </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-icon">👤</div>
+                    <h3 id="total-users">0</h3>
+                    <p>إجمالي الحسابات</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <h3 id="active-users">0</h3>
+                    <p>حساب فعال</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🤖</div>
+                    <h3 id="ai-users">0</h3>
+                    <p>مفعل بالذكاء</p>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-title">➕ إضافة حساب جديد</div>
                 <div class="grid">
-                    <div class="input-group"><label>الاسم</label><input type="text" id="f-name"></div>
-                    <div class="input-group"><label>النوع</label><select id="f-role"><option value="doctor">طبيب</option><option value="lab">مختبر</option><option value="radiology">أشعة</option></select></div>
-                    <div class="input-group"><label>التخصص</label><input type="text" id="f-spec"></div>
-                    <div class="input-group"><label>اليوزر</label><input type="text" id="f-user"></div>
-                    <div class="input-group" style="grid-column: span 2;"><label>الباسورد</label><input type="password" id="f-pass"></div>
+                    <div class="input-group">
+                        <label>الاسم</label>
+                        <input type="text" id="f-name" placeholder="د. أحمد / مختبر الشفاء">
+                    </div>
+                    <div class="input-group">
+                        <label>الاختصاص / النوع</label>
+                        <select id="f-role">
+                            <option value="doctor">طبيب</option>
+                            <option value="lab">مختبر تحاليل</option>
+                            <option value="radiology">مركز أشعة</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>التخصص / الوصف</label>
+                        <input type="text" id="f-spec" placeholder="طب باطني">
+                    </div>
+                    <div class="input-group">
+                        <label>اسم المستخدم</label>
+                        <input type="text" id="f-user" placeholder="username">
+                    </div>
+                    <div class="input-group" style="grid-column: span 2;">
+                        <label>كلمة المرور</label>
+                        <input type="password" id="f-pass" placeholder="••••••••">
+                    </div>
                 </div>
-                <button class="btn btn-primary" id="add-btn" onclick="saveUser()">🔗 إنشاء حساب</button>
+                <button class="btn btn-primary" id="add-btn" onclick="saveUser()">
+                    <span>🔗 إنشاء حساب ورابط</span>
+                </button>
             </div>
+
             <div class="card">
+                <div class="card-title">📋 قائمة الحسابات</div>
                 <table>
-                    <thead><tr><th>الاسم</th><th>النوع</th><th>اليوزر</th><th>الاشتراك</th><th>AI</th><th>حذف</th></tr></thead>
-                    <tbody id="user-list"></tbody>
+                    <thead>
+                        <tr>
+                            <th>الاسم</th>
+                            <th>النوع</th>
+                            <th>اليوزر</th>
+                            <th>الاشتراك</th>
+                            <th>AI 🤖</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-list">
+                        <tr><td colspan="6" style="text-align:center; color:#aaa;">⏳ جاري التحميل...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
+
         <div id="research-section" style="display:none;">
-            <div class="header"><h1>البحث العلمي</h1></div>
-            <div class="card" id="research-list"></div>
+            <div class="header">
+                <h1>البحث العلمي</h1>
+                <div class="badge">🔬 مرجع طبي</div>
+            </div>
+            <div class="card">
+                <div class="card-title">📚 أرشيف التشخيصات</div>
+                <div id="research-list">
+                    <p style="text-align:center; color:#aaa;">⏳ جاري جمع البيانات العلمية...</p>
+                </div>
+            </div>
         </div>
     </div>
+
     <script>
         const SUPABASE_URL = 'https://fxpiflttulvrthhvdbyj.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_v-PAdAxX73uizls_ywMpjA_DQlG3h7g';
@@ -96,47 +194,161 @@
 
         function showToast(msg, type='success') {
             const t = document.getElementById('toast');
-            t.innerText = msg; t.style.background = type === 'success' ? '#2e7d32' : '#d32f2f';
-            t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000);
+            t.innerText = msg;
+            t.style.background = type === 'success' ? '#2e7d32' : '#d32f2f';
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        function showSection(id) {
+            document.getElementById('accounts-section').style.display = id === 'accounts' ? 'block' : 'none';
+            document.getElementById('research-section').style.display = id === 'research' ? 'block' : 'none';
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            if(id === 'research') loadResearch();
         }
 
         async function loadUsers() {
-            const { data, error } = await _supabase.from('doctors').select('*').order('created_at', { ascending: false });
-            if (error) return;
-            const tbody = document.getElementById('user-list');
-            tbody.innerHTML = '';
-            data.forEach(u => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${u.name}</td><td>${u.role}</td><td>${u.username}</td>
-                    <td><input type="checkbox" ${u.active ? 'checked' : ''} onchange="updateUser('${u.id}', {active: this.checked})"></td>
-                    <td><input type="checkbox" ${u.ai_enabled ? 'checked' : ''} onchange="updateUser('${u.id}', {ai_enabled: this.checked})"></td>
-                    <td><span onclick="deleteUser('${u.id}')">🗑️</span></td>`;
-                tbody.appendChild(tr);
-            });
-            document.getElementById('total-users').innerText = data.length;
-            document.getElementById('active-users').innerText = data.filter(u => u.active).length;
-            document.getElementById('ai-users').innerText = data.filter(u => u.ai_enabled).length;
+            try {
+                const { data, error } = await _supabase.from('doctors').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+                
+                const tbody = document.getElementById('user-list');
+                tbody.innerHTML = '';
+                
+                let aiCount = 0;
+                data.forEach(u => {
+                    if(u.ai_enabled) aiCount++;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><b>${u.name}</b><br><small style="color:#888">${u.specialty}</small></td>
+                        <td><span class="role-badge role-${u.role}">${u.role === 'doctor' ? 'طبيب' : u.role === 'lab' ? 'مختبر' : 'أشعة'}</span></td>
+                        <td><code>${u.username}</code></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" ${u.active ? 'checked' : ''} onchange="toggleStatus('${u.id}', 'active', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" ${u.ai_enabled ? 'checked' : ''} onchange="toggleStatus('${u.id}', 'ai_enabled', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <span class="action-btn copy-btn" title="نسخ رابط الدخول" onclick="copyLoginLink('${u.slug}')">🔗</span>
+                            <span class="action-btn delete-btn" title="حذف" onclick="deleteUser('${u.id}')">🗑️</span>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                document.getElementById('total-users').innerText = data.length;
+                document.getElementById('active-users').innerText = data.filter(u => u.active).length;
+                document.getElementById('ai-users').innerText = aiCount;
+            } catch (e) {
+                console.error(e);
+                showToast('فشل تحميل البيانات', 'error');
+            }
         }
 
         async function saveUser() {
+            const btn = document.getElementById('add-btn');
             const name = document.getElementById('f-name').value;
             const role = document.getElementById('f-role').value;
             const spec = document.getElementById('f-spec').value;
             const user = document.getElementById('f-user').value;
             const pass = document.getElementById('f-pass').value;
-            if(!name || !user || !pass) return showToast('أكمل البيانات', 'error');
-            const slug = user + '-' + Math.random().toString(36).substr(2, 5);
-            const { error } = await _supabase.from('doctors').insert([{ name, role, specialty: spec, username: user, password: pass, slug }]);
-            if (error) showToast('خطأ في الإضافة', 'error');
-            else { showToast('تمت الإضافة'); loadUsers(); }
+
+            if(!name || !user || !pass) return showToast('يرجى ملء كافة الحقول', 'error');
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ جاري الإنشاء...';
+
+            try {
+                const slug = user + '-' + Math.random().toString(36).substr(2, 5);
+                const { error } = await _supabase.from('doctors').insert([{
+                    name, role, specialty: spec, username: user, password: pass, slug, active: true, ai_enabled: false
+                }]);
+
+                if (error) throw error;
+
+                showToast('تم إنشاء الحساب بنجاح');
+                document.getElementById('f-name').value = '';
+                document.getElementById('f-user').value = '';
+                document.getElementById('f-pass').value = '';
+                loadUsers();
+            } catch (e) {
+                console.error(e);
+                showToast('خطأ: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔗 إنشاء حساب ورابط';
+            }
         }
 
-        async function updateUser(id, obj) { await _supabase.from('doctors').update(obj).eq('id', id); loadUsers(); }
-        async function deleteUser(id) { if(confirm('حذف؟')) { await _supabase.from('doctors').delete().eq('id', id); loadUsers(); } }
-        function showSection(id) { 
-            document.getElementById('accounts-section').style.display = id === 'accounts' ? 'block' : 'none';
-            document.getElementById('research-section').style.display = id === 'research' ? 'block' : 'none';
+        async function toggleStatus(id, field, val) {
+            try {
+                const { error } = await _supabase.from('doctors').update({ [field]: val }).eq('id', id);
+                if (error) throw error;
+                showToast('تم التحديث بنجاح');
+                loadUsers();
+            } catch (e) {
+                showToast('فشل التحديث', 'error');
+            }
         }
+
+        async function deleteUser(id) {
+            if(!confirm('هل أنت متأكد من حذف هذا الحساب نهائياً؟')) return;
+            try {
+                const { error } = await _supabase.from('doctors').delete().eq('id', id);
+                if (error) throw error;
+                showToast('تم الحذف بنجاح');
+                loadUsers();
+            } catch (e) {
+                showToast('فشل الحذف', 'error');
+            }
+        }
+
+        function copyLoginLink(slug) {
+            const link = window.location.origin + window.location.pathname.replace('index.html', 'dr-login.html') + '?ref=' + slug;
+            navigator.clipboard.writeText(link).then(() => {
+                showToast('تم نسخ رابط الدخول بنجاح');
+            });
+        }
+
+        async function loadResearch() {
+            const list = document.getElementById('research-list');
+            try {
+                const { data, error } = await _supabase.from('patient_visits').select('*, patients(name)').order('created_at', { ascending: false });
+                if (error) throw error;
+                
+                if(data.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:#aaa;">لا توجد بيانات بحثية بعد</p>';
+                    return;
+                }
+
+                list.innerHTML = data.map(v => `
+                    <div style="padding:15px; border-bottom:1px solid #eee;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <b style="color:var(--primary)">التشخيص: ${v.diagnosis_detail || 'غير محدد'}</b>
+                            <small style="color:#aaa">${new Date(v.created_at).toLocaleDateString('ar-EG')}</small>
+                        </div>
+                        <p style="margin:0; font-size:13px; color:#666;">العلاج: ${v.treatment || 'لا يوجد'}</p>
+                        ${v.ai_analysis ? `<div style="margin-top:10px; padding:10px; background:#f0f7f0; border-radius:8px; font-size:12px; color:#1e5631;">🤖 تحليل AI: ${v.ai_analysis}</div>` : ''}
+                    </div>
+                `).join('');
+            } catch (e) {
+                list.innerHTML = '<p style="text-align:center; color:red;">فشل تحميل الأرشيف</p>';
+            }
+        }
+
+        // Auto-Wakeup for Supabase
+        setInterval(() => {
+            _supabase.from('doctors').select('id').limit(1);
+        }, 60000);
+
         window.onload = loadUsers;
     </script>
 </body>
