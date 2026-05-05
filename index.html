@@ -331,7 +331,7 @@
         }
 
         function copyLoginLink(slug) {
-            const link = window.location.origin + window.location.pathname.replace('index.html', 'dr-login.html') + '?ref=' + slug;
+            const link = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'dr-login.html?ref=' + slug;
             navigator.clipboard.writeText(link).then(() => {
                 showToast('تم نسخ رابط الدخول بنجاح');
             });
