@@ -49,16 +49,11 @@
         .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: #143d22; transform: translateY(-2px); }
-        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
 
         /* Table */
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
         th { background: #f8f9fa; padding: 15px; text-align: right; font-size: 13px; color: #777; border-bottom: 2px solid #eee; }
         td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .role-badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
-        .role-doctor { background: #e3f2fd; color: #1976d2; }
-        .role-lab { background: #f3e5f5; color: #7b1fa2; }
-        .role-rad { background: #fff3e0; color: #f57c00; }
         
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -67,10 +62,29 @@
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        .action-btn { cursor: pointer; font-size: 18px; margin: 0 5px; transition: 0.3s; }
-        .action-btn:hover { transform: scale(1.2); }
-        .copy-btn { color: var(--secondary); }
-        .delete-btn { color: #d32f2f; }
+        /* Copy Link Button Style */
+        .copy-link-btn {
+            background: linear-gradient(135deg, var(--primary), #2e7d32);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            border: none;
+            box-shadow: 0 4px 10px rgba(30, 86, 49, 0.2);
+        }
+        .copy-link-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(30, 86, 49, 0.3);
+        }
+        .copy-link-btn i { font-size: 14px; }
+
+        .delete-btn { color: #d32f2f; cursor: pointer; font-size: 18px; margin-right: 15px; }
         
         /* Copyright */
         .copyright { text-align: center; padding: 20px; font-size: 12px; color: #aaa; }
@@ -163,11 +177,12 @@
                             <th>اليوزر</th>
                             <th>الاشتراك</th>
                             <th>AI 🤖</th>
-                            <th>إجراءات</th>
+                            <th>رابط الدخول</th>
+                            <th>حذف</th>
                         </tr>
                     </thead>
                     <tbody id="user-list">
-                        <tr><td colspan="6" style="text-align:center; color:#aaa;">⏳ جاري التحميل...</td></tr>
+                        <tr><td colspan="7" style="text-align:center; color:#aaa;">⏳ جاري التحميل...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -237,8 +252,12 @@
                             </label>
                         </td>
                         <td>
-                            <span class="action-btn copy-btn" title="نسخ رابط الدخول" onclick="copyLoginLink('${u.slug}')">🔗</span>
-                            <span class="action-btn delete-btn" title="حذف" onclick="deleteUser('${u.id}')">🗑️</span>
+                            <button class="copy-link-btn" onclick="copyLoginLink('${u.slug}')">
+                                🔗 نسخ الرابط
+                            </button>
+                        </td>
+                        <td>
+                            <span class="delete-btn" onclick="deleteUser('${u.id}')">🗑️</span>
                         </td>
                     `;
                     tbody.appendChild(tr);
